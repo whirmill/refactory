@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>Storie dalla Sala Macchine</title>
+<link>https://esempio.com/storie</link>
+<description>Storie vere dalla sala macchine. I nomi sono stati cambiati per proteggere i colpevoli.</description>
+<language>it-it</language>
+<lastBuildDate>Sat, 28 Jun 2026 12:00:00 +0200</lastBuildDate>
+
+<item>
+<title>Il Monitoraggio</title>
+<link>https://esempio.com/storie/2026/18-il-monitoraggio.md</link>
+<description>850 alert al giorno. 99.998% falsi positivi. Quando c'è un vero problema, nessuno se ne accorge.</description>
+<pubDate>Sat, 28 Jun 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Vecchio Sistema</title>
+<link>https://esempio.com/storie/2026/17-il-vecchio-sistema.md</link>
+<description>Un sistema del 2003. Scritto da Mario. Che è morto. E il sistema muore con lui. Portandosi via 23 anni di dati.</description>
+<pubDate>Fri, 20 Jun 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Lo Standup Infinito</title>
+<link>https://esempio.com/storie/2026/16-lo-standup-infinito.md</link>
+<description>Lo standup dovrebbe durare 15 minuti. Il nostro dura 90. E non è nemmeno uno standup. È un interrogatorio.</description>
+<pubDate>Fri, 12 Jun 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>La Riunione Che Poteva Essere una Email</title>
+<link>https://esempio.com/storie/2026/15-la-riunione-che-poteva-essere-email.md</link>
+<description>6 ore al giorno in riunioni. 2 ore a lavorare. Il 92% delle riunioni poteva essere un'email. Ma le email non sono "collaborative".</description>
+<pubDate>Thu, 05 Jun 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Comitato e il Dinosauro</title>
+<link>https://esempio.com/storie/2026/14-il-comitato-e-il-dinosauro.md</link>
+<description>Il GADC blocca tutto. Anche le emergenze. Anche i bugfix. Anche la disperazione. E i giovani se ne vanno.</description>
+<pubDate>Thu, 28 May 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>L'Audit</title>
+<link>https://esempio.com/storie/2026/13-laudit.md</link>
+<description>L'audit ha trovato 47 non conformità. Erano le stesse di 10 anni fa. Ma adesso sono ufficiali.</description>
+<pubDate>Mon, 20 May 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Consulente</title>
+<link>https://esempio.com/storie/2026/12-il-consulente.md</link>
+<description>100.000€ per un consulente che ha detto quello che dicevo io da 10 anni. Ma con un framework.</description>
+<pubDate>Mon, 10 May 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>La Lezione (Che Non Serve a Niente)</title>
+<link>https://esempio.com/storie/2026/11-la-lezione.md</link>
+<description>Formazione obbligatoria per tutti. 4 ore. Risultato: tutti hanno fallito il test vero.</description>
+<pubDate>Fri, 02 May 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>L'Agenzia Forense</title>
+<link>https://esempio.com/storie/2026/10-agenzia-forense.md</link>
+<description>L'azienda che ha sempre lesinato sulla sicurezza ora paga 300.000€ per un'agenzia che non risolve nulla.</description>
+<pubDate>Mon, 25 Apr 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>L'Hard Disk Misterioso</title>
+<link>https://esempio.com/storie/2026/09-hard-disk-misterioso.md</link>
+<description>Un pacco misterioso. Un hard disk premio. Un manager che lo collega al PC. E 15 anni di dati persi in 4 minuti.</description>
+<pubDate>Mon, 20 Apr 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>La Migrazione di Primavera</title>
+<link>https://esempio.com/storie/2026/08-migrazione-primavera.md</link>
+<description>Quando UL decide che è ora di migrare, è ora di migrare. Anche se non c'è un piano.</description>
+<pubDate>Wed, 15 Apr 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Ticket Eterno</title>
+<link>https://esempio.com/storie/2026/07-ticket-eterno.md</link>
+<description>C'è un ticket aperto da tre anni. Nessuno sa perché è ancora aperto.</description>
+<pubDate>Wed, 25 Mar 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>La VPN Che Non Funziona Mai</title>
+<link>https://esempio.com/storie/2026/06-vpn-non-funziona.md</link>
+<description>La VPN funziona sempre. Tranne quando serve. Che è sempre.</description>
+<pubDate>Mon, 10 Mar 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Server Senza Nome</title>
+<link>https://esempio.com/storie/2026/05-server-senza-nome.md</link>
+<description>C'è un server senza nome. Nessuno sa cosa fa. Nessuno ha il coraggio di chiedere.</description>
+<pubDate>Sat, 28 Feb 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>La Riunione delle 17:30</title>
+<link>https://esempio.com/storie/2026/04-riunione-1730.md</link>
+<description>Le riunioni alle 17:30 di venerdì sono sempre una buona idea. Detto nessuno mai.</description>
+<pubDate>Thu, 12 Feb 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Database Senza Spazio</title>
+<link>https://esempio.com/storie/2026/03-database-senza-spazio.md</link>
+<description>Il database ha finito lo spazio. Di nuovo. Per la terza volta questo mese.</description>
+<pubDate>Thu, 05 Feb 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>La Stampante Posseduta</title>
+<link>https://esempio.com/storie/2026/02-stampante-posseduta.md</link>
+<description>La stampante del terzo piano è posseduta. Non c'è altra spiegazione.</description>
+<pubDate>Fri, 22 Jan 2026 12:00:00 +0200</pubDate>
+</item>
+
+<item>
+<title>Il Certificato Scaduto</title>
+<link>https://esempio.com/storie/2026/01-certificato-scaduto.md</link>
+<description>Il certificato SSL è scaduto. Di nuovo. Per la quinta volta quest'anno.</description>
+<pubDate>Fri, 15 Jan 2026 12:00:00 +0200</pubDate>
+</item>
+
+</channel>
+</rss>
