@@ -122,4 +122,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](25-il-refactor-che-nessuno-ha-chiesto.md)**
+**[Home](../index.md) | [Precedente](25-il-refactor-che-nessuno-ha-chiesto.md) | [Prossima](27-la-demo-davanti-al-ceo.md)**

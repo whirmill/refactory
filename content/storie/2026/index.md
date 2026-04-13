@@ -12,6 +12,30 @@
 
 ---
 
+### [La Demo Davanti Al CEO](27-la-demo-davanti-al-ceo.md)
+
+**Data**: 23/08/2026
+
+Il CEO vuole vedere la nuova feature. Venerdì alle 15:00. Il momento peggiore per una demo. E un cron dimenticato che riavvia il database proprio in quel momento.
+
+---
+
+### [La Soluzione Temporanea](26-la-soluzione-temporanea.md)
+
+**Data**: 16/08/2026
+
+Un cache temporaneo per una query lenta. Tre mesi dopo, il cache è ancora lì. E si riempie ogni settimana. Perché le soluzioni temporanee sono permanenti.
+
+---
+
+### [Il Refactor Che Nessuno Ha Chiesto](25-il-refactor-che-nessuno-ha-chiesto.md)
+
+**Data**: 09/08/2026
+
+Il codice funzionava. Il JN l'ha refactorato. Ora non funziona più. E ci sono 3 bug nuovi. E un cliente arrabbiato.
+
+---
+
 ### [Il Feature Flag Dimenticato](24-il-feature-flag-dimenticato.md)
 
 **Data**: 02/08/2026
@@ -166,7 +190,7 @@ Il certificato SSL è scaduto. Di nuovo. Per la quinta volta quest'anno.
 
 ## Statistiche 2026
 
-- **Storie pubblicate**: 19
+- **Storie pubblicate**: 22
 - **Server morti**: 4
 - **Server infettati da ransomware**: tutti
 - **Anni di dati persi**: 38 (15 ransomware + 23 sistema legacy)
