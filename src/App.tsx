@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { HomePage } from '@/pages/HomePage';
 import { StoryPage } from '@/pages/StoryPage';
@@ -8,7 +8,7 @@ import { TestPage } from '@/pages/TestPage';
 
 function App() {
   return (
-    <HashRouter>
+    <BrowserRouter basename="/refactory">
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
@@ -18,7 +18,7 @@ function App() {
           <Route path="test" element={<TestPage />} />
         </Route>
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 
