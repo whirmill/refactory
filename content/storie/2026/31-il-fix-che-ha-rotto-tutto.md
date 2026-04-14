@@ -2,7 +2,7 @@
 
 **Data**: 20/09/2026
 
-**[Home](../index.md) | [Precedente](30-il-server-di-sviluppo-in-produzione.md)**
+**[Home](../index.md) | [Precedente](30-il-server-di-sviluppo-in-produzione.md) | [Prossima](32-la-riunione-che-poteva-essere-una-email.md)**
 
 ---
 
@@ -281,4 +281,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](30-il-server-di-sviluppo-in-produzione.md)**
+**[Home](../index.md) | [Precedente](30-il-server-di-sviluppo-in-produzione.md) | [Prossima](32-la-riunione-che-poteva-essere-una-email.md)**

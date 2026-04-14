@@ -12,6 +12,22 @@
 
 ---
 
+### [La Riunione Che Poteva Essere Una Email](32-la-riunione-che-poteva-essere-una-email.md)
+
+**Data**: 27/09/2026
+
+7 riunioni per un progetto che non esiste. 16 ore di allineamento su nulla. E il CTO che finalmente dice: "Mandatemi un'email."
+
+---
+
+### [Il Fix Che Ha Rotto Tutto](31-il-fix-che-ha-rotto-tutto.md)
+
+**Data**: 20/09/2026
+
+Una riga di codice. Un fix semplice. E 847 report da rifare. Perché una riga non è mai una riga.
+
+---
+
 ### [Il Deploy Di Venerdì](28-il-deploy-di-venerdi.md)
 
 **Data**: 30/08/2026
@@ -198,7 +214,7 @@ Il certificato SSL è scaduto. Di nuovo. Per la quinta volta quest'anno.
 
 ## Statistiche 2026
 
-- **Storie pubblicate**: 28
+- **Storie pubblicate**: 32
 - **Server morti**: 4
 - **Server infettati da ransomware**: tutti
 - **Anni di dati persi**: 38 (15 ransomware + 23 sistema legacy)
