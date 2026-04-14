@@ -322,4 +322,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](32-la-riunione-che-poteva-essere-una-email.md)**
+**[Home](../index.md) | [Precedente](32-la-riunione-che-poteva-essere-una-email.md) | [Prossima](34-il-fix-provvisorio-definitivo.md)**
