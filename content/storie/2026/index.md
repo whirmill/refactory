@@ -12,6 +12,30 @@
 
 ---
 
+### [Il Server Fantasma](35-il-server-fantasma.md)
+
+**Data**: 18/10/2026
+
+Un server senza nome. 847 giorni di uptime. €291.309 spesi. E un database chiamato "truth.db" che contiene 47 milioni di peccati aziendali.
+
+---
+
+### [Il Fix Provvisorio Definitivo](34-il-fix-provvisorio-definitivo.md)
+
+**Data**: 11/10/2026
+
+Un fix provvisorio che è diventato permanente. Per 2 anni e 7 mesi. E quando finalmente è stato fixato, si è scoperto che era stato copiato in altri 3 database.
+
+---
+
+### [Il Refactor Che Nessuno Ha Chiesto](33-il-refactor-che-nessuno-ha-chiesto.md)
+
+**Data**: 04/10/2026
+
+Il codice funzionava. Il JN l'ha refactorato. Ora non funziona più. E ci sono 3 bug nuovi. E un cliente arrabbiato.
+
+---
+
 ### [La Riunione Che Poteva Essere Una Email](32-la-riunione-che-poteva-essere-una-email.md)
 
 **Data**: 27/09/2026
@@ -214,7 +238,7 @@ Il certificato SSL è scaduto. Di nuovo. Per la quinta volta quest'anno.
 
 ## Statistiche 2026
 
-- **Storie pubblicate**: 32
+- **Storie pubblicate**: 35
 - **Server morti**: 4
 - **Server infettati da ransomware**: tutti
 - **Anni di dati persi**: 38 (15 ransomware + 23 sistema legacy)

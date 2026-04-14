@@ -2,7 +2,7 @@
 
 **Data**: 11/10/2026
 
-**[Home](../index.md) | [Precedente](33-il-refactor-che-nessuno-ha-chiesto.md)**
+**[Home](../index.md) | [Precedente](33-il-refactor-che-nessuno-ha-chiesto.md) | [Prossima](35-il-server-fantasma.md)**
 
 ---
 
