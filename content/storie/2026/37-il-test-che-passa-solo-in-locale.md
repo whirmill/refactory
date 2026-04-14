@@ -274,4 +274,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](36-il-ticket-che-non-muore-mai.md)**
+**[Home](../index.md) | [Precedente](36-il-ticket-che-non-muore-mai.md) | [Prossima](38-il-deploy-del-venerdi.md)**
