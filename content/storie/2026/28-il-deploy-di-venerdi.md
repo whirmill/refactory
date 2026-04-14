@@ -4,7 +4,7 @@
 
 ---
 
-**[Home](../index.md) | [Precedente](27-la-demo-davanti-al-ceo.md)**
+**[Home](../index.md) | [Precedente](27-la-demo-davanti-al-ceo.md) | [Prossima](29-il-microservizio-che-non-serve.md)**
 
 ---
 
@@ -210,4 +210,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](27-la-demo-davanti-al-ceo.md)**
+**[Home](../index.md) | [Precedente](27-la-demo-davanti-al-ceo.md) | [Prossima](29-il-microservizio-che-non-serve.md)**
