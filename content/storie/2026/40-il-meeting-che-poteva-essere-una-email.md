@@ -2,7 +2,7 @@
 
 **Data**: 22/11/2026
 
-**[Home](../index.md) | [Precedente](39-il-commento-todo-eterno.md)]**
+**[Home](../index.md) | [Precedente](39-il-commento-todo-eterno.md) | [Prossima](41-il-refactor-che-non-finisce-mai.md)]**
 
 ---
 
@@ -341,4 +341,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](39-il-commento-todo-eterno.md)]**
+**[Home](../index.md) | [Precedente](39-il-commento-todo-eterno.md) | [Prossima](41-il-refactor-che-non-finisce-mai.md)]**
