@@ -2,7 +2,7 @@
 
 **Data**: 25/10/2026
 
-**[Home](../index.md) | [Precedente](35-il-server-fantasma.md)**
+**[Home](../index.md) | [Precedente](35-il-server-fantasma.md) | [Prossima](37-il-test-che-passa-solo-in-locale.md)]**
 
 ---
 
@@ -337,4 +337,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](35-il-server-fantasma.md)**
+**[Home](../index.md) | [Precedente](35-il-server-fantasma.md) | [Prossima](37-il-test-che-passa-solo-in-locale.md)]**
