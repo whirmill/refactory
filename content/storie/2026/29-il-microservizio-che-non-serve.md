@@ -4,7 +4,7 @@
 
 ---
 
-**[Home](../index.md) | [Precedente](28-il-deploy-di-venerdi.md)**
+**[Home](../index.md) | [Precedente](28-il-deploy-di-venerdi.md) | [Prossima](30-il-server-di-sviluppo-in-produzione.md)**
 
 ---
 
@@ -214,4 +214,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](28-il-deploy-di-venerdi.md)**
+**[Home](../index.md) | [Precedente](28-il-deploy-di-venerdi.md) | [Prossima](30-il-server-di-sviluppo-in-produzione.md)]**
