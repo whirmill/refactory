@@ -2,7 +2,7 @@
 
 **Data**: 29/11/2026
 
-**[Home](../index.md) | [Precedente](40-il-meeting-che-poteva-essere-una-email.md)]**
+**[Home](../index.md) | [Precedente](40-il-meeting-che-poteva-essere-una-email.md) | [Prossima](42-il-microservizio-che-e-diventato-un-monolite.md)]**
 
 ---
 
@@ -345,4 +345,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](40-il-meeting-che-poteva-essere-una-email.md)]**
+**[Home](../index.md) | [Precedente](40-il-meeting-che-poteva-essere-una-email.md) | [Prossima](42-il-microservizio-che-e-diventato-un-monolite.md)]**
