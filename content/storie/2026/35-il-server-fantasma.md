@@ -2,7 +2,7 @@
 
 **Data**: 18/10/2026
 
-**[Home](../index.md) | [Precedente](34-il-fix-provvisorio-definitivo.md)**
+**[Home](../index.md) | [Precedente](34-il-fix-provvisorio-definitivo.md) | [Prossima](36-il-ticket-che-non-muore-mai.md)**
 
 ---
 
