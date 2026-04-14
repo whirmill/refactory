@@ -2,7 +2,7 @@
 
 **Data**: 15/11/2026
 
-**[Home](../index.md) | [Precedente](38-il-deploy-del-venerdi.md)]**
+**[Home](../index.md) | [Precedente](38-il-deploy-del-venerdi.md) | [Prossima](40-il-meeting-che-poteva-essere-una-email.md)]**
 
 ---
 
