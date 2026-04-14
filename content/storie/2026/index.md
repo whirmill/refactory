@@ -12,6 +12,14 @@
 
 ---
 
+### [Il Deploy Di Venerdì](28-il-deploy-di-venerdi.md)
+
+**Data**: 30/08/2026
+
+Il PM vuole fare un deploy alle 16:30 di venerdì. Il JN ha usato una variabile globale. Il sito va giù. E il CTO ha un volo alle 19:00.
+
+---
+
 ### [La Demo Davanti Al CEO](27-la-demo-davanti-al-ceo.md)
 
 **Data**: 23/08/2026
@@ -190,7 +198,7 @@ Il certificato SSL è scaduto. Di nuovo. Per la quinta volta quest'anno.
 
 ## Statistiche 2026
 
-- **Storie pubblicate**: 22
+- **Storie pubblicate**: 28
 - **Server morti**: 4
 - **Server infettati da ransomware**: tutti
 - **Anni di dati persi**: 38 (15 ransomware + 23 sistema legacy)

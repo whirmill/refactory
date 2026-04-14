@@ -4,7 +4,7 @@
 
 ---
 
-**[Home](../index.md) | [Precedente](26-la-soluzione-temporanea.md)**
+**[Home](../index.md) | [Precedente](26-la-soluzione-temporanea.md) | [Prossima](28-il-deploy-di-venerdi.md)**
 
 ---
 
@@ -170,4 +170,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](26-la-soluzione-temporanea.md)**
+**[Home](../index.md) | [Precedente](26-la-soluzione-temporanea.md) | [Prossima](28-il-deploy-di-venerdi.md)**
