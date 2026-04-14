@@ -2,7 +2,7 @@
 
 **Data**: 08/11/2026
 
-**[Home](../index.md) | [Precedente](37-il-test-che-passa-solo-in-locale.md)]**
+**[Home](../index.md) | [Precedente](37-il-test-che-passa-solo-in-locale.md) | [Prossima](39-il-commento-todo-eterno.md)]**
 
 ---
 
