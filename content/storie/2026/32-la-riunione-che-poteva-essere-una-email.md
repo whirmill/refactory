@@ -2,7 +2,7 @@
 
 **Data**: 27/09/2026
 
-**[Home](../index.md) | [Precedente](31-il-fix-che-ha-rotto-tutto.md)**
+**[Home](../index.md) | [Precedente](31-il-fix-che-ha-rotto-tutto.md) | [Prossima](33-il-refactor-che-nessuno-ha-chiesto.md)**
 
 ---
 
