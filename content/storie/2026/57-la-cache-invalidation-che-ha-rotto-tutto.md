@@ -2,7 +2,7 @@
 
 **Data**: 21/03/2027
 
-**[Home](../index.md) | [Precedente](56-il-deploy-del-venerdi-pomeriggio.md)]**
+**[Home](../index.md) | [Precedente](56-il-deploy-del-venerdi-pomeriggio.md) | [Prossima](58-il-cron-job-che-girava-ogni-secondo.md)]**
 
 ---
 
@@ -419,4 +419,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](56-il-deploy-del-venerdi-pomeriggio.md)]**
+**[Home](../index.md) | [Precedente](56-il-deploy-del-venerdi-pomeriggio.md) | [Prossima](58-il-cron-job-che-girava-ogni-secondo.md)]**
