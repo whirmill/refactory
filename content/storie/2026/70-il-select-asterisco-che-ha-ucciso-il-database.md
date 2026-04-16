@@ -2,7 +2,7 @@
 
 **Data**: 20/06/2026
 
-**[Home](../index.md) | [Precedente](69-il-cron-job-che-non-si-fermava-mai.md)]**
+**[Home](../index.md) | [Precedente](69-il-cron-job-che-non-si-fermava-mai.md) | [Prossima](71-la-migration-che-ha-cancellato-la-tabella.md)]**
 
 ---
 
