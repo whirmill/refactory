@@ -2,7 +2,7 @@
 
 **Data**: 17/01/2027
 
-**[Home](../index.md) | [Precedente](47-la-riunione-che-poteva-essere-una-email.md)]**
+**[Home](../index.md) | [Precedente](47-la-riunione-che-poteva-essere-una-email.md) | [Prossima](49-il-server-che-nessuno-osava-spegere.md)]**
 
 ---
 
