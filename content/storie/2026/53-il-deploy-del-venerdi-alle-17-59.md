@@ -2,7 +2,7 @@
 
 **Data**: 21/02/2027
 
-**[Home](../index.md) | [Precedente](52-la-riunione-che-poteva-essere-una-email.md)]**
+**[Home](../index.md) | [Precedente](52-la-riunione-che-poteva-essere-una-email.md) | [Prossima](54-il-refactor-che-ha-rotto-tutto.md)]**
 
 ---
 
