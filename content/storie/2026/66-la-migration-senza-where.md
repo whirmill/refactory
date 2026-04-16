@@ -2,7 +2,7 @@
 
 **Data**: 23/05/2026
 
-**[Home](../index.md) | [Precedente](65-la-cache-che-non-venne-invalidata.md)]**
+**[Home](../index.md) | [Precedente](65-la-cache-che-non-venne-invalidata.md) | [Prossima](67-la-api-key-nel-repo-pubblico.md)]**
 
 ---
 
