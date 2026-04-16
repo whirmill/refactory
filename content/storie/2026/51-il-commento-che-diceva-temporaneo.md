@@ -2,7 +2,7 @@
 
 **Data**: 07/02/2027
 
-**[Home](../index.md) | [Precedente](50-il-bug-che-esisteva-solo-in-produzione.md)]**
+**[Home](../index.md) | [Precedente](50-il-bug-che-esisteva-solo-in-produzione.md) | [Prossima](52-la-riunione-che-poteva-essere-una-email.md)]**
 
 ---
 
