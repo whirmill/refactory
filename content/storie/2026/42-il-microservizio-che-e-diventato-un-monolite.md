@@ -2,7 +2,7 @@
 
 **Data**: 06/12/2026
 
-**[Home](../index.md) | [Precedente](41-il-refactor-che-non-finisce-mai.md)]**
+**[Home](../index.md) | [Precedente](41-il-refactor-che-non-finisce-mai.md) | [Prossima](43-il-deploy-del-venerdi.md)]**
 
 ---
 
@@ -412,4 +412,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](41-il-refactor-che-non-finisce-mai.md)]**
+**[Home](../index.md) | [Precedente](41-il-refactor-che-non-finisce-mai.md) | [Prossima](43-il-deploy-del-venerdi.md)]**
