@@ -1074,4 +1074,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](73-il-git-push-force-che-ha-cancellato-tutto.md)]**
+**[Home](../index.md) | [Precedente](73-il-git-push-force-che-ha-cancellato-tutto.md) | [Prossima](75-il-server-fantasma.md)]**
