@@ -2,7 +2,7 @@
 
 **Data**: 31/01/2027
 
-**[Home](../index.md) | [Precedente](49-il-server-che-nessuno-osava-spegere.md)]**
+**[Home](../index.md) | [Precedente](49-il-server-che-nessuno-osava-spegere.md) | [Prossima](51-il-commento-che-diceva-temporaneo.md)]**
 
 ---
 
