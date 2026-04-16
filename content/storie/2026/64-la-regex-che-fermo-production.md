@@ -2,7 +2,7 @@
 
 **Data**: 09/05/2026
 
-**[Home](../index.md) | [Precedente](63-il-file-env-nel-repository.md)]**
+**[Home](../index.md) | [Precedente](63-il-file-env-nel-repository.md) | [Prossima](65-la-cache-che-non-venne-invalidata.md)]**
 
 ---
 
