@@ -2,7 +2,7 @@
 
 **Data**: 30/05/2026
 
-**[Home](../index.md) | [Precedente](66-la-migration-senza-where.md)]**
+**[Home](../index.md) | [Precedente](66-la-migration-senza-where.md) | [Prossima](68-il-deploy-del-venerdi-alle-1758.md)]**
 
 ---
 
@@ -598,4 +598,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](66-la-migration-senza-where.md)]**
+**[Home](../index.md) | [Precedente](66-la-migration-senza-where.md) | [Prossima](68-il-deploy-del-venerdi-alle-1758.md)]**
