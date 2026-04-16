@@ -2,7 +2,7 @@
 
 **Data**: 24/01/2027
 
-**[Home](../index.md) | [Precedente](48-il-deploy-del-venerdi-sera.md)]**
+**[Home](../index.md) | [Precedente](48-il-deploy-del-venerdi-sera.md) | [Prossima](50-il-bug-che-esisteva-solo-in-produzione.md)]**
 
 ---
 
