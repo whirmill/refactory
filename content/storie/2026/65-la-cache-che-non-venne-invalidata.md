@@ -2,7 +2,7 @@
 
 **Data**: 16/05/2026
 
-**[Home](../index.md) | [Precedente](64-la-regex-che-fermo-production.md)]**
+**[Home](../index.md) | [Precedente](64-la-regex-che-fermo-production.md) | [Prossima](66-la-migration-senza-where.md)]**
 
 ---
 
