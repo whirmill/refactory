@@ -2,7 +2,7 @@
 
 **Data**: 15/08/2026
 
-**[Home](../index.md) | [Precedente](77-la-migration-che-ha-droppato-la-tabella-users.md)]**
+**[Home](../index.md) | [Precedente](77-la-migration-che-ha-droppato-la-tabella-users.md) | [Prossima](79-il-log-che-ha-riempito-il-disco.md)]**
 
 ---
 
