@@ -2,7 +2,7 @@
 
 **Data**: 07/03/2027
 
-**[Home](../index.md) | [Precedente](54-il-refactor-che-ha-rotto-tutto.md)]**
+**[Home](../index.md) | [Precedente](54-il-refactor-che-ha-rotto-tutto.md) | [Prossima](56-il-deploy-del-venerdi-pomeriggio.md)]**
 
 ---
 
@@ -415,4 +415,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](54-il-refactor-che-ha-rotto-tutto.md)]**
+**[Home](../index.md) | [Precedente](54-il-refactor-che-ha-rotto-tutto.md) | [Prossima](56-il-deploy-del-venerdi-pomeriggio.md)]**
