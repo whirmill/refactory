@@ -469,4 +469,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](60-la-feature-flag-che-nessuno-ricordava.md)]**
+**[Home](../index.md) | [Precedente](60-la-feature-flag-che-nessuno-ricordava.md) | [Prossima](62-il-deploy-delle-18-di-venerdi.md)]**
