@@ -2,7 +2,7 @@
 
 **Data**: 13/06/2026
 
-**[Home](../index.md) | [Precedente](68-il-deploy-del-venerdi-alle-1758.md)]**
+**[Home](../index.md) | [Precedente](68-il-deploy-del-venerdi-alle-1758.md) | [Prossima](70-il-select-asterisco-che-ha-ucciso-il-database.md)]**
 
 ---
 
