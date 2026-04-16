@@ -2,7 +2,7 @@
 
 **Data**: 08/08/2026
 
-**[Home](../index.md) | [Precedente](76-il-kubernetes-deployment-che-ha-scalato-a-100-repliche.md)]**
+**[Home](../index.md) | [Precedente](76-il-kubernetes-deployment-che-ha-scalato-a-100-repliche.md) | [Prossima](78-il-cron-job-che-girava-ogni-minuto.md)]**
 
 ---
 
