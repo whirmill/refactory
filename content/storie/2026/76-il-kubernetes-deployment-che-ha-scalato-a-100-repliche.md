@@ -2,7 +2,7 @@
 
 **Data**: 01/08/2026
 
-**[Home](../index.md) | [Precedente](75-il-server-fantasma.md)]**
+**[Home](../index.md) | [Precedente](75-il-server-fantasma.md) | [Prossima](77-la-migration-che-ha-droppato-la-tabella-users.md)]**
 
 ---
 
