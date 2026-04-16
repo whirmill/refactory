@@ -2,7 +2,7 @@
 
 **Data**: 10/01/2027
 
-**[Home](../index.md) | [Precedente](46-il-backup-che-non-esisteva.md)]**
+**[Home](../index.md) | [Precedente](46-il-backup-che-non-esisteva.md) | [Prossima](48-il-deploy-del-venerdi-sera.md)]**
 
 ---
 
