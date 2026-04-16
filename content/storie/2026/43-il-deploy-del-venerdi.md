@@ -2,7 +2,7 @@
 
 **Data**: 13/12/2026
 
-**[Home](../index.md) | [Precedente](42-il-microservizio-che-e-diventato-un-monolite.md)]**
+**[Home](../index.md) | [Precedente](42-il-microservizio-che-e-diventato-un-monolite.md) | [Prossima](44-il-bug-che-era-un-feature.md)]**
 
 ---
 
