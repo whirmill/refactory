@@ -2,7 +2,7 @@
 
 **Data**: 04/04/2027
 
-**[Home](../index.md) | [Precedente](58-il-cron-job-che-girava-ogni-secondo.md)]**
+**[Home](../index.md) | [Precedente](58-il-cron-job-che-girava-ogni-secondo.md) | [Prossima](60-la-feature-flag-che-nessuno-ricordava.md)]**
 
 ---
 
