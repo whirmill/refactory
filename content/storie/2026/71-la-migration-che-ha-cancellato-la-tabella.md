@@ -2,7 +2,7 @@
 
 **Data**: 27/06/2026
 
-**[Home](../index.md) | [Precedente](70-il-select-asterisco-che-ha-ucciso-il-database.md)]**
+**[Home](../index.md) | [Precedente](70-il-select-asterisco-che-ha-ucciso-il-database.md) | [Prossima](72-il-file-env-che-era-su-git.md)]**
 
 ---
 
