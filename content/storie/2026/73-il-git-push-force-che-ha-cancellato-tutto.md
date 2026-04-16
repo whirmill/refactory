@@ -2,7 +2,7 @@
 
 **Data**: 11/07/2026
 
-**[Home](../index.md) | [Precedente](72-il-file-env-che-era-su-git.md)]**
+**[Home](../index.md) | [Precedente](72-il-file-env-che-era-su-git.md) | [Prossima](74-il-npm-update-che-ha-rotto-tutto.md)]**
 
 ---
 
