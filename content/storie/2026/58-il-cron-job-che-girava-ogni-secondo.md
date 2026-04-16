@@ -2,7 +2,7 @@
 
 **Data**: 28/03/2027
 
-**[Home](../index.md) | [Precedente](57-la-cache-invalidation-che-ha-rotto-tutto.md)]**
+**[Home](../index.md) | [Precedente](57-la-cache-invalidation-che-ha-rotto-tutto.md) | [Prossima](59-il-backup-che-non-esisteva.md)]**
 
 ---
 
