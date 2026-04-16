@@ -506,4 +506,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](61-la-query-che-non-aveva-where.md)]**
+**[Home](../index.md) | [Precedente](61-la-query-che-non-aveva-where.md) | [Prossima](63-il-file-env-nel-repository.md)]**
