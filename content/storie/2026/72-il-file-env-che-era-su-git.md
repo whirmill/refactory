@@ -2,7 +2,7 @@
 
 **Data**: 04/07/2026
 
-**[Home](../index.md) | [Precedente](71-la-migration-che-ha-cancellato-la-tabella.md)]**
+**[Home](../index.md) | [Precedente](71-la-migration-che-ha-cancellato-la-tabella.md) | [Prossima](73-il-git-push-force-che-ha-cancellato-tutto.md)]**
 
 ---
 
