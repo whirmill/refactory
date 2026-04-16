@@ -2,7 +2,7 @@
 
 **Data**: 11/04/2027
 
-**[Home](../index.md) | [Precedente](59-il-backup-che-non-esisteva.md)]**
+**[Home](../index.md) | [Precedente](59-il-backup-che-non-esisteva.md) | [Prossima](61-la-query-che-non-aveva-where.md)]**
 
 ---
 
