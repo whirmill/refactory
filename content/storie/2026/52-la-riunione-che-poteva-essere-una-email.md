@@ -2,7 +2,7 @@
 
 **Data**: 14/02/2027
 
-**[Home](../index.md) | [Precedente](51-il-commento-che-diceva-temporaneo.md)]**
+**[Home](../index.md) | [Precedente](51-il-commento-che-diceva-temporaneo.md) | [Prossima](53-il-deploy-del-venerdi-alle-17-59.md)]**
 
 ---
 
