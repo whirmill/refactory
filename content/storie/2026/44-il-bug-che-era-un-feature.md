@@ -2,7 +2,7 @@
 
 **Data**: 20/12/2026
 
-**[Home](../index.md) | [Precedente](43-il-deploy-del-venerdi.md)]**
+**[Home](../index.md) | [Precedente](43-il-deploy-del-venerdi.md) | [Prossima](45-il-branch-che-non-moriva-mai.md)]**
 
 ---
 
