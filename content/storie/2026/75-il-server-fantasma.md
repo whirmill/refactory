@@ -2,7 +2,7 @@
 
 **Data**: 25/07/2026
 
-**[Home](../index.md) | [Precedente](74-il-npm-update-che-ha-rotto-tutto.md)]**
+**[Home](../index.md) | [Precedente](74-il-npm-update-che-ha-rotto-tutto.md) | [Prossima](76-il-kubernetes-deployment-che-ha-scalato-a-100-repliche.md)]**
 
 ---
 
@@ -704,4 +704,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](74-il-npm-update-che-ha-rotto-tutto.md)]**
+**[Home](../index.md) | [Precedente](74-il-npm-update-che-ha-rotto-tutto.md) | [Prossima](76-il-kubernetes-deployment-che-ha-scalato-a-100-repliche.md)]**
