@@ -2,7 +2,7 @@
 
 **Data**: 06/06/2026
 
-**[Home](../index.md) | [Precedente](67-la-api-key-nel-repo-pubblico.md)]**
+**[Home](../index.md) | [Precedente](67-la-api-key-nel-repo-pubblico.md) | [Prossima](69-il-cron-job-che-non-si-fermava-mai.md)]**
 
 ---
 
