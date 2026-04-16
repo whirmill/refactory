@@ -373,4 +373,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](44-il-bug-che-era-un-feature.md)]**
+**[Home](../index.md) | [Precedente](44-il-bug-che-era-un-feature.md) | [Prossima](46-il-backup-che-non-esisteva.md)]**
