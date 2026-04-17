@@ -2,7 +2,7 @@
 
 **Data**: 10/04/2026
 
-**[Storie 2026](index.md) | [Precedente](111-il-feature-flag-che-non-si-spegneva-mai.md) | [Prossima](113-la-query-che-ha-fuso-il-database.md)**
+**[Storie 2026](index.md) | [Precedente](111-il-feature-flag-che-non-si-spegneva-mai.md) | [Prossima](113-il-migration-che-ha-cancellato-la-tabella-sbagliata.md)**
 
 ---
 
@@ -793,4 +793,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](111-il-feature-flag-che-non-si-spegneva-mai.md) | [Prossima](113-la-query-che-ha-fuso-il-database.md)**
+**[Storie 2026](index.md) | [Precedente](111-il-feature-flag-che-non-si-spegneva-mai.md) | [Prossima](113-il-migration-che-ha-cancellato-la-tabella-sbagliata.md)**
