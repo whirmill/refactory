@@ -2,7 +2,7 @@
 
 **Data**: 09/01/2027
 
-**[Storie 2026](index.md) | [Precedente](98-il-rollback-che-non-e-mai-arrivato.md) | [Prossima](100-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](98-il-rollback-che-non-e-mai-arrivato.md) | [Prossima](100-il-feature-flag-che-nessuno-ricordava.md)**
 
 ---
 
@@ -940,4 +940,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](98-il-rollback-che-non-e-mai-arrivato.md) | [Prossima](100-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](98-il-rollback-che-non-e-mai-arrivato.md) | [Prossima](100-il-feature-flag-che-nessuno-ricordava.md)**
