@@ -12,6 +12,14 @@
 
 ---
 
+### [Il Rollback Che Non È Mai Arrivato](98-il-rollback-che-non-e-mai-arrivato.md)
+
+**Data**: 02/01/2027
+
+JN fa un deploy. Il database si sovraccarica. Prova a fare rollback. Ma l'immagine non esiste. Il registry l'ha cancellata. E 1234 ordini vengono persi.
+
+---
+
 ### [Il Secret Che Era Nel Repo Pubblico](97-il-secret-che-era-nel-repo-pubblico.md)
 
 **Data**: 26/12/2026

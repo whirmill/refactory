@@ -2,7 +2,7 @@
 
 **Data**: 26/12/2026
 
-**[Storie 2026](index.md) | [Precedente](96-il-webhook-che-ha-inondato-la-coda.md) | [Prossima](98-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](96-il-webhook-che-ha-inondato-la-coda.md) | [Prossima](98-il-rollback-che-non-e-mai-arrivato.md)**
 
 ---
 
@@ -825,4 +825,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](96-il-webhook-che-ha-inondato-la-coda.md) | [Prossima](98-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](96-il-webhook-che-ha-inondato-la-coda.md) | [Prossima](98-il-rollback-che-non-e-mai-arrivato.md)**
