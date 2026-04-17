@@ -805,4 +805,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](81-il-regex-che-ha-mangiato-la-cpu.md)]**
+**[Home](../index.md) | [Precedente](81-il-regex-che-ha-mangiato-la-cpu.md) | [Prossima](83-la-variabile-che-era-diversa-in-produzione.md)]**
