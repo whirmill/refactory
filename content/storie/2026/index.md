@@ -12,6 +12,22 @@
 
 ---
 
+### [Il Feature Flag Che Nessuno Ricordava](100-il-feature-flag-che-nessuno-ricordava.md)
+
+**Data**: 16/01/2027
+
+JN tocca feature flag vecchi di 18 mesi. I prezzi impazziscono. E i clienti vedono prezzi a caso. Perché i feature flag vanno rimossi. Sempre.
+
+---
+
+### [Il Health Check Che Mentiva Sempre](99-il-health-check-che-mentiva-sempre.md)
+
+**Data**: 09/01/2027
+
+Un health check che restituisce sempre 200 OK. Anche quando il database è down. E 1247 errori dopo, JN impara che l'health check deve dire la verità.
+
+---
+
 ### [Il Rollback Che Non È Mai Arrivato](98-il-rollback-che-non-e-mai-arrivato.md)
 
 **Data**: 02/01/2027

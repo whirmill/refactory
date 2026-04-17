@@ -2,823 +2,867 @@
 
 **Data**: 16/01/2027
 
-**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-migrazione-che-ha-cancellato-la-tabella-sbagliata.md)**
+**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-migration-che-ha-bloccato-tutto.md)**
 
 ---
 
-C'è una verità nel feature toggling che tutti conoscono ma nessuno rispetta: i feature flag vanno rimossi. Sempre. Dopo che la feature è stata rilasciata. E testata. E verificata. E quando dico "rimossi", intendo eliminati dal codice. Non disabilitati nel pannello di controllo. Non settati a "false" nel file di configurazione. ELIMINATI. Dal codice. Perché un feature flag disabilitato è come una bomba a orologeria. È lì. Pronta a esplodere. E un giorno qualcuno la attiva per sbaglio. O un bot la attiva. O un test la attiva. E la bomba esplode. E tu ti chiedi: "Com'è possibile che il feature flag fosse ancora lì?" E la risposta è semplice: perché nessuno lo ricordava. E il feature flag era lì. Da due anni. E nessuno sapeva cosa faceva. E quando è stato attivato, ha fatto quello che era programmato per fare. E quello che era programmato per fare era distruggere tutto. Amen.
+C'è una verità nel feature toggling che tutti conoscono ma nessuno rispetta: i feature flag vanno rimossi. Sempre. Dopo che la feature è stata rilasciata. E testata. E verificata. E quando il feature flag non viene rimosso, succede quello che deve succedere: qualcuno lo attiva per sbaglio. O lo disattiva per sbaglio. O lo dimentica. E il sistema si comporta in modo strano. E i clienti chiamano. E UL chiama. E tu rispondi. E dici: "Non capisco, non abbiamo cambiato nulla." E invece qualcosa è cambiato. Il feature flag che nessuno ricordava. Che era lì da 18 mesi. E qualcuno l'ha toccato. E il sistema è impazzito. E tu ti chiedi: "Com'è possibile che un feature flag vecchio di 18 mesi fosse ancora attivo?" E la risposta è semplice: perché nessuno l'ha mai rimosso. E i feature flag sono come i debiti tecnici. Se non li paghi, si accumulano. E prima o poi ti presentano il conto. Amen.
 
 ![](../../img/server.jpg)
 
 ---
 
-**Lunedì - L'Attivazione**
+**Lunedì - L'Incidente**
 
-Era lunedì. Le 09:00. Il caffè era pronto. Il sistema sembrava ok.
+Era lunedì. Le 10:00. Il caffè era pronto. Il sistema sembrava ok.
 
-Poi è arrivato l'alert.
+Poi è arrivato il ticket.
 
-**ALERT**: Order processing rate dropped by 95%
+**SUPPORTO**: I clienti vedono prezzi sbagliati. Alcuni vedono prezzi vecchi. Altri prezzi nuovi. Altri prezzi che non esistono.
 
-**ME**: Il processing degli ordini è crollato?!
+**ME**: Prezzi sbagliati?!
 
-**TL**: Crollato?!
+**TL**: Prezzi sbagliati?!
 
-**ME**: Sì. Dal 95%.
+**ME**: Sì. I clienti vedono prezzi diversi per lo stesso prodotto.
 
-**TL**: E QUANTI ORDINI?!
+**TL**: E QUANTI CLIENTI?!
 
 **ME**: Non lo so. Controllo.
 
 **TERMINALE**:
 ```
+# Controlla log
+kubectl logs -l app=pricing-service --since=30m | grep -i price | tail -20
+2027-01-16 09:45:12 INFO: Price calculated for product SKU-123: €99.99 (v2)
+2027-01-16 09:45:13 INFO: Price calculated for product SKU-123: €149.99 (v1)
+2027-01-16 09:45:14 INFO: Price calculated for product SKU-123: €99.99 (v2)
+2027-01-16 09:45:15 INFO: Price calculated for product SKU-123: €199.99 (legacy)
+
 # Controlla metriche
-kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum(rate(orders_processed_total[5m]))'
-{status: "success", data: {result: [{value: ["12"]}]}}  # 12 ordini al minuto
+kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum by (version) (rate(pricing_calculations_total[5m]))'
+{version: "v1"}: 234
+{version: "v2"}: 189
+{version: "legacy"}: 67
 
-# Normalmente?
-kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum(rate(orders_processed_total[5m] offset 1h))'
-{status: "success", data: {result: [{value: ["234"]}]}}  # 234 ordini al minuto
-
-# Controlla errori
-kubectl logs -l app=order-service --since=30m | grep -i error | tail -20
-2027-01-16 08:55:01 ERROR: Order validation failed: invalid_promo_code
-2027-01-16 08:55:01 ERROR: Order rejected: promo_code_not_found
-2027-01-16 08:55:02 ERROR: Order validation failed: invalid_promo_code
-...
-
-# Conta errori
-kubectl logs -l app=order-service --since=30m | grep -i "invalid_promo_code" | wc -l
-8923
+# Controlla database
+kubectl exec -it postgres-0 -- psql -U admin -c "SELECT price_version, COUNT(*) FROM products GROUP BY price_version"
+price_version | count
+---------------+-------
+v1            | 1234
+v2            | 567
+legacy        | 89
 ```
 
-**ME**: 8923 ordini rifiutati per "invalid_promo_code".
+**ME**: Ci sono tre versioni di prezzi. V1, V2, e legacy.
 
-**TL**: PROMO CODE?!
+**TL**: TRE VERSIONI?!
 
-**ME**: Sì. Ma non abbiamo promo code attivi.
+**ME**: Sì. E i clienti vedono prezzi diversi a caso.
 
-**TL**: E ALLORA PERCHÉ?!
+**TL**: E PERCHÉ?!
 
-**ME**: Non lo so. Guardo il codice.
+**ME**: Non lo so. Controllo il codice.
 
 **TERMINALE**:
 ```
-# Cerca promo code nel codice
-grep -r "promo_code" src/ | head -20
-src/services/order.js:    if (featureFlags.STRICT_PROMO_VALIDATION) {
-src/services/order.js:      const promo = await validatePromoCode(order.promoCode);
-src/services/order.js:      if (!promo.valid) {
-src/services/order.js:        throw new Error('invalid_promo_code');
-src/services/order.js:      }
-src/services/order.js:    }
+# Cerca feature flag
+grep -r "price" src/config/feature-flags.js
+  USE_NEW_PRICING_V2: true,
+  USE_LEGACY_PRICING: false,
+  USE_PRICING_V1_FALLBACK: true,
 
-# Controlla feature flag
-curl -s http://feature-flag-service:8080/flags | jq '.flags.STRICT_PROMO_VALIDATION'
+# Controlla LaunchDarkly
+curl -s "https://app.launchdarkly.com/api/v2/flags/default" -H "Authorization: $LD_API_KEY" | jq '.items[] | select(.key | contains("price"))'
 {
-  "name": "STRICT_PROMO_VALIDATION",
-  "enabled": true,
-  "created_at": "2025-03-15T10:00:00Z",
-  "created_by": "unknown",
-  "description": null
+  "key": "use-new-pricing-v2",
+  "name": "Use New Pricing V2",
+  "created": "2025-07-15T10:00:00Z",
+  "modified": "2027-01-16T09:30:00Z",
+  "on": true
+}
+{
+  "key": "use-legacy-pricing",
+  "name": "Use Legacy Pricing",
+  "created": "2024-06-01T08:00:00Z",
+  "modified": "2027-01-16T09:30:00Z",
+  "on": true
+}
+{
+  "key": "use-pricing-v1-fallback",
+  "name": "Use Pricing V1 Fallback",
+  "created": "2025-03-20T14:00:00Z",
+  "modified": "2027-01-16T09:30:00Z",
+  "on": true
 }
 ```
 
-**ME**: C'è un feature flag "STRICT_PROMO_VALIDATION" che è attivo.
+**ME**: Ci sono tre feature flag per i prezzi. Tutti attivi.
 
-**TL**: ATTIVO?!
+**TL**: TUTTI ATTIVI?!
 
-**ME**: Sì. E valida i promo code. Ma i promo code non esistono più.
+**ME**: Sì. E uno è stato creato 18 mesi fa.
 
-**TL**: NON ESISTONO PIÙ?!
+**TL**: 18 MESI?!
 
-**ME**: No. Li abbiamo rimossi sei mesi fa.
+**ME**: Sì. "use-legacy-pricing" è del giugno 2024.
 
-**TL**: E IL FEATURE FLAG?!
+**TL**: E PERCHÉ È ANCORA ATTIVO?!
 
-**ME**: Il feature flag è ancora lì. E ora è attivo.
+**ME**: Non lo so. E qualcuno l'ha modificato stamattina alle 09:30.
 
-**TL**: E CHI L'HA ATTIVATO?!
+**TL**: CHI?!
 
-**ME**: Non lo so. Controllo i log.
-
-**TERMINALE**:
-```
-# Controlla log feature flag service
-kubectl logs feature-flag-service-0 --since=2h | grep STRICT_PROMO_VALIDATION
-2027-01-16 08:45:23 INFO: Flag STRICT_PROMO_VALIDATION set to true by user: deployment-bot
-
-# Controlla deployment-bot
-kubectl logs deployment-bot-0 --since=2h | grep STRICT_PROMO_VALIDATION
-2027-01-16 08:45:22 INFO: Syncing feature flags from config repository
-2027-01-16 08:45:22 INFO: Found flag STRICT_PROMO_VALIDATION in legacy-flags.yaml
-2027-01-16 08:45:22 INFO: Setting STRICT_PROMO_VALIDATION = true (from config)
-```
-
-**ME**: Il deployment-bot ha attivato il flag. Leggendo da un file di configurazione legacy.
-
-**TL**: LEGACY?!
-
-**ME**: Sì. C'è un file "legacy-flags.yaml" che ha il flag settato a true.
-
-**TL**: E CHI L'HA CREATO?!
-
-**ME**: Non lo so. Il file è del marzo 2025.
-
-**TL**: MARZO 2025?!
-
-**ME**: Sì. Quasi due anni fa.
-
-Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Feature flag: STRICT_PROMO_VALIDATION
-- Stato: attivo
-- Creato: marzo 2025
-- Creato da: unknown
-- Descrizione: nessuna
-- Risultato: 8923 ordini rifiutati
-
-E tutto era chiaro. Un feature flag dimenticato. Attivato per sbaglio. Che ha bloccato il sistema. Amen.
-
----
-
-**Lunedì - 09:30**
-
-Ho disattivato il flag. E gli ordini hanno ripreso a fluire.
+**ME**: Controllo l'audit log.
 
 **TERMINALE**:
 ```
-# Disattiva flag
-curl -X POST http://feature-flag-service:8080/flags/STRICT_PROMO_VALIDATION/disable
-{"status": "disabled"}
+# Controlla audit log LaunchDarkly
+curl -s "https://app.launchdarkly.com/api/v2/auditlog" -H "Authorization: $LD_API_KEY" | jq '.items[] | select(.target.name | contains("price")) | {date: .date, kind: .kind, member: .member.email}'
 
-# Verifica
-curl -s http://feature-flag-service:8080/flags | jq '.flags.STRICT_PROMO_VALIDATION'
 {
-  "name": "STRICT_PROMO_VALIDATION",
-  "enabled": false
+  "date": "2027-01-16T09:30:00Z",
+  "kind": "flagUpdated",
+  "member": "jn@company.com"
 }
-
-# Controlla ordini
-kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum(rate(orders_processed_total[5m]))'
-{status: "success", data: {result: [{value: ["198"]}]}}  # 198 ordini al minuto
-
-# Controlla errori
-kubectl logs -l app=order-service --since=5m | grep -i "invalid_promo_code" | wc -l
-0
 ```
 
-**ME**: Flag disattivato. Ordini ripresi. Zero errori.
+**ME**: JN ha modificato i feature flag stamattina alle 09:30.
 
-**TL**: E GLI ORDINI PERSI?!
+**TL**: JN?!
 
-**ME**: 8923. In 30 minuti.
+**ME**: Sì. Ha attivato tutti e tre i flag.
 
-**TL**: E IL VALORE?!
+**TL**: E PERCHÉ?!
 
-**ME**: Non lo so. Controllo.
-
-**TERMINALE**:
-```
-# Controlla valore medio ordine
-kubectl exec -it postgres-0 -- psql -U orders -c "SELECT AVG(total) FROM orders WHERE created_at > '2027-01-01'"
-avg
--------
-€45.23
-
-# Calcola valore perso
-# 8923 ordini × €45.23 = €403,598.29
-```
-
-**ME**: Circa 400.000 euro di ordini persi.
-
-**TL**: 400.000 EURO?!
-
-**ME**: Sì. Ma... non tutti i clienti torneranno. Quindi è una perdita potenziale.
-
-**TL**: E UL?!
-
-**ME**: UL... lo chiamo.
+**ME**: Non lo so. Lo chiamo.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Flag: disattivato
-- Ordini: ripresi
-- Persi: 8923
-- Valore: €400,000
+- Feature flag: 3 attivi
+- Creati: 2024-2025
+- Modificati: stamattina 09:30
+- Autore: JN
+- Risultato: prezzi a caso
 
-E tutto funzionava di nuovo. Ma i soldi erano persi. E il feature flag era ancora lì. Nel codice. E nel file di configurazione. E nessuno sapeva perché. Amen.
+E tutto era chiaro. JN aveva toccato feature flag vecchi. E il sistema era impazzito. Amen.
 
 ---
 
-**Lunedì - 10:00**
+**Lunedì - 10:30**
 
-Ho chiamato UL. UL ha risposto. Era lunedì. UL era calmo. Per ora.
+Ho chiamato JN. JN ha risposto. Era lunedì. JN era confuso.
 
-**UL**: Buongiorno! Come va?
+**ME**: JN, hai modificato i feature flag stamattina?
 
-**ME**: Abbiamo avuto un problema con gli ordini.
+**JN**: Sì. Volevo testare una cosa.
 
-**UL**: Che problema?
+**ME**: TESTARE?!
 
-**ME**: Un feature flag dimenticato è stato attivato. E ha bloccato 8923 ordini.
+**JN**: Sì. Volevo vedere come funzionavano i prezzi.
 
-**UL**: 8923 ORDINI?!
+**ME**: E HAI ATTIVATO TUTTI E TRE I FLAG?!
 
-**ME**: Sì. Per 30 minuti.
+**JN**: Sì. Per vedere quale aveva la precedenza.
 
-**UL**: E IL VALORE?!
+**ME**: E IN PRODUZIONE?!
 
-**ME**: Circa 400.000 euro. Potenziali.
+**JN**: Ah. Sì. Non c'era staging.
 
-**UL**: 400.000 EURO?!
+**ME**: JN, I FEATURE FLAG VANNO TESTATI IN STAGING!
 
-**ME**: Sì. Ma ho disattivato il flag. E gli ordini sono ripresi.
+**JN**: Ma non c'era il flag in staging!
 
-**UL**: E COME FA UN FEATURE FLAG A BLOCCARE GLI ORDINI?!
+**ME**: E QUINDI L'HAI FATTO IN PRODUZIONE?!
 
-**ME**: Il flag attivava la validazione dei promo code. Ma i promo code non esistono più.
+**JN**: Sì. Solo per un minuto.
 
-**UL**: NON ESISTONO PIÙ?!
+**ME**: E I CLIENTI HANNO VISTO PREZZI SBAGLIATI!
 
-**ME**: No. Li abbiamo rimossi sei mesi fa. Ma il flag era ancora lì.
+**JN**: Ma... li ho rimessi come prima!
 
-**UL**: E PERCHÉ ERA ANCORA LÌ?!
+**ME**: E COME ERANO PRIMA?!
 
-**ME**: Perché nessuno lo ricordava. Era del marzo 2025.
+**JN**: Non lo so. Li ho attivati tutti.
 
-**UL**: MARZO 2025?!
+**ME**: JN, I FLAG ERANO TUTTI DISATTIVI TRANNE V2!
 
-**ME**: Sì. Quasi due anni fa.
+**JN**: Ah. Non lo sapevo.
 
-**UL**: E NESSUNO L'HA RIMOSSO?!
+**ME**: E ORA SONO TUTTI ATTIVI!
 
-**ME**: No. E il deployment-bot l'ha attivato leggendo un file legacy.
+**JN**: E QUINDI?!
 
-**UL**: E CHI HA CREATO IL FILE?!
+**ME**: E QUINDI I CLIENTI VEDONO PREZZI A CASO!
 
-**ME**: Non lo so. C'era scritto "unknown".
+**JN**: Ah. Fixo.
 
-**UL**: E ORA?!
+**ME**: E LA PROSSIMA VOLTA CHIEDI!
 
-**ME**: Ora il flag è disattivato. E sto per rimuoverlo dal codice.
+**JN**: Ok.
 
-**UL**: E LA PROSSIMA VOLTA?!
+JN ha riattaccato. O forse è scappato. Non ricordo. Ricordo solo che guardavo il terminale. Il terminale mostrava:
+- Feature flag: tutti attivi
+- Prezzi: a caso
+- JN: confuso
+- Clienti: incazzati
 
-**ME**: La prossima volta... aggiungo un processo per rimuovere i feature flag vecchi.
-
-**UL**: Bene. Documenta tutto.
-
-E io ho documentato. E UL ha riattaccato. E la lezione era chiara. I feature flag vanno rimossi. E i file legacy vanno puliti. E la documentazione è obbligatoria. Amen.
+E la lezione era chiara. I feature flag vanno gestiti con cura. E JN va educato. Amen.
 
 ---
 
 **Lunedì - 11:00**
 
-Ho auditato tutti i feature flag. Per trovare altre bombe a orologeria.
+Ho fixato i feature flag. E i prezzi.
+
+**TERMINALE**:
+```
+# Disattiva flag legacy
+curl -X PATCH "https://app.launchdarkly.com/api/v2/flags/default/use-legacy-pricing" \
+  -H "Authorization: $LD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"on": false}'
+
+# Disattiva flag v1 fallback
+curl -X PATCH "https://app.launchdarkly.com/api/v2/flags/default/use-pricing-v1-fallback" \
+  -H "Authorization: $LD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"on": false}'
+
+# Verifica
+curl -s "https://app.launchdarkly.com/api/v2/flags/default" -H "Authorization: $LD_API_KEY" | jq '.items[] | select(.key | contains("price")) | {key, on}'
+{
+  "key": "use-new-pricing-v2",
+  "on": true
+}
+{
+  "key": "use-legacy-pricing",
+  "on": false
+}
+{
+  "key": "use-pricing-v1-fallback",
+  "on": false
+}
+
+# Controlla prezzi
+kubectl logs -l app=pricing-service --since=5m | grep -i price | tail -10
+2027-01-16 11:05:12 INFO: Price calculated for product SKU-123: €99.99 (v2)
+2027-01-16 11:05:13 INFO: Price calculated for product SKU-456: €149.99 (v2)
+2027-01-16 11:05:14 INFO: Price calculated for product SKU-789: €199.99 (v2)
+```
+
+**ME**: Feature flag fixati. Solo V2 attivo.
+
+**TL**: E I PREZZI?!
+
+**ME**: Tutti usano V2. Coerenti.
+
+**TL**: E I CLIENTI?!
+
+**ME**: Vedono i prezzi corretti.
+
+**TL**: E JN?!
+
+**ME**: JN... lo educo.
+
+**TL**: E I FLAG VECCHI?!
+
+**ME**: Li rimuovo. Tutti.
 
 **TERMINALE**:
 ```
 # Lista tutti i feature flag
-curl -s http://feature-flag-service:8080/flags | jq '.flags | keys'
-[
-  "STRICT_PROMO_VALIDATION",
-  "NEW_CHECKOUT_FLOW",
-  "LEGACY_PAYMENT_GATEWAY",
-  "EXPERIMENTAL_SEARCH",
-  "DISABLE_RATE_LIMITING",
-  "SKIP_AUTH_FOR_TESTING",
-  "ENABLE_DEBUG_LOGGING",
-  "OLD_EMAIL_PROVIDER",
-  "BYPASS_VALIDATION",
-  "USE_LEGACY_API"
-]
-
-# Controlla età dei flag
-for flag in STRICT_PROMO_VALIDATION NEW_CHECKOUT_FLOW LEGACY_PAYMENT_GATEWAY EXPERIMENTAL_SEARCH DISABLE_RATE_LIMITING SKIP_AUTH_FOR_TESTING ENABLE_DEBUG_LOGGING OLD_EMAIL_PROVIDER BYPASS_VALIDATION USE_LEGACY_API; do
-  echo "=== $flag ==="
-  curl -s http://feature-flag-service:8080/flags/$flag | jq '{created_at, created_by, description}'
-done
+curl -s "https://app.launchdarkly.com/api/v2/flags/default" -H "Authorization: $LD_API_KEY" | jq '.items[] | {key, name, created, on}'
 
 # Risultati
-=== STRICT_PROMO_VALIDATION ===
-{"created_at": "2025-03-15", "created_by": "unknown", "description": null}
-
-=== NEW_CHECKOUT_FLOW ===
-{"created_at": "2025-06-20", "created_by": "jn", "description": "New checkout flow - remove after v2.0 release"}
-
-=== LEGACY_PAYMENT_GATEWAY ===
-{"created_at": "2024-11-10", "created_by": "bob", "description": null}
-
-=== EXPERIMENTAL_SEARCH ===
-{"created_at": "2025-01-05", "created_by": "me", "description": "Experimental search - remove after testing"}
-
-=== DISABLE_RATE_LIMITING ===
-{"created_at": "2024-08-22", "created_by": "unknown", "description": null}
-
-=== SKIP_AUTH_FOR_TESTING ===
-{"created_at": "2024-05-15", "created_by": "jn", "description": "Skip auth for testing - REMOVE BEFORE PROD"}
-
-=== ENABLE_DEBUG_LOGGING ===
-{"created_at": "2024-12-01", "created_by": "bob", "description": null}
-
-=== OLD_EMAIL_PROVIDER ===
-{"created_at": "2024-02-28", "created_by": "unknown", "description": null}
-
-=== BYPASS_VALIDATION ===
-{"created_at": "2024-09-10", "created_by": "unknown", "description": null}
-
-=== USE_LEGACY_API ===
-{"created_at": "2023-11-20", "created_by": "legacy", "description": null}
+{
+  "key": "use-new-pricing-v2",
+  "name": "Use New Pricing V2",
+  "created": "2025-07-15T10:00:00Z",
+  "on": true
+}
+{
+  "key": "use-legacy-pricing",
+  "name": "Use Legacy Pricing",
+  "created": "2024-06-01T08:00:00Z",
+  "on": false
+}
+{
+  "key": "use-pricing-v1-fallback",
+  "name": "Use Pricing V1 Fallback",
+  "created": "2025-03-20T14:00:00Z",
+  "on": false
+}
+{
+  "key": "enable-dark-mode",
+  "name": "Enable Dark Mode",
+  "created": "2024-02-15T09:00:00Z",
+  "on": true
+}
+{
+  "key": "use-new-checkout-flow",
+  "name": "Use New Checkout Flow",
+  "created": "2024-09-10T11:00:00Z",
+  "on": true
+}
+{
+  "key": "enable-beta-features",
+  "name": "Enable Beta Features",
+  "created": "2023-11-20T14:00:00Z",
+  "on": false
+}
+{
+  "key": "use-legacy-auth",
+  "name": "Use Legacy Auth",
+  "created": "2023-08-01T08:00:00Z",
+  "on": false
+}
+{
+  "key": "enable-new-dashboard",
+  "name": "Enable New Dashboard",
+  "created": "2024-04-01T10:00:00Z",
+  "on": true
+}
+{
+  "key": "use-experimental-cache",
+  "name": "Use Experimental Cache",
+  "created": "2023-06-15T16:00:00Z",
+  "on": false
+}
+{
+  "key": "enable-logging-v2",
+  "name": "Enable Logging V2",
+  "created": "2024-01-10T09:00:00Z",
+  "on": true
+}
 ```
 
-**ME**: Ci sono 10 feature flag. E almeno 5 sono potenzialmente pericolosi.
+**ME**: Ci sono 10 feature flag. Alcuni vecchi di 3 anni.
 
-**TL**: PERICOLOSI?!
+**TL**: 3 ANNI?!
 
-**ME**: Sì. Guarda questi:
-- DISABLE_RATE_LIMITING: disabilita il rate limiting
-- SKIP_AUTH_FOR_TESTING: salta l'autenticazione
-- BYPASS_VALIDATION: bypassa la validazione
-- ENABLE_DEBUG_LOGGING: logga tutto
-- USE_LEGACY_API: usa API vecchie
+**ME**: Sì. "use-experimental-cache" è del giugno 2023.
 
-**TL**: E SE VENGONO ATTIVATI?!
+**TL**: E È ANCORA LÌ?!
 
-**ME**: SKIP_AUTH_FOR_TESTING permette a chiunque di accedere senza auth. DISABLE_RATE_LIMITING permette DDoS. BYPASS_VALIDATION permette dati invalidi.
+**ME**: Sì. Disattivato. Ma ancora nel codice.
 
-**TL**: E SONO ATTIVI?!
+**TL**: E QUANTI SONO ATTIVI?!
 
-**ME**: No. Per ora. Ma sono lì. Pronti.
+**ME**: 5. Gli altri 5 sono disattivati ma non rimossi.
 
-**TL**: E QUANTI ANNI HANNO?!
+**TL**: E QUINDI?!
 
-**ME**: Da 1 a 3 anni. Il più vecchio è del novembre 2023.
-
-**TL**: E NESSUNO LI HA RIMOSSI?!
-
-**ME**: No. Perché nessuno li ricordava.
+**ME**: E quindi... sono debito tecnico. Che aspetta di esplodere.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
 - Feature flag totali: 10
-- Flag pericolosi: 5
-- Età media: 1.5 anni
-- Più vecchio: novembre 2023
-- Documentazione: quasi inesistente
+- Attivi: 5
+- Disattivati: 5
+- Più vecchio: giugno 2023
+- Debito tecnico: alto
 
-E tutto era chiaro. I feature flag si accumulano. E nessuno li rimuove. E diventano bombe a orologeria. Amen.
+E la lezione era chiara. I feature flag vanno rimossi. E il debito tecnico si accumula. Amen.
 
 ---
 
 **Lunedì - 14:00**
 
-Ho rimosso i feature flag pericolosi. E pulito il codice.
+Ho auditato tutti i feature flag. Per capire cosa potevo rimuovere.
 
 **TERMINALE**:
 ```
-# Rimuovi flag pericolosi
-curl -X DELETE http://feature-flag-service:8080/flags/SKIP_AUTH_FOR_TESTING
-curl -X DELETE http://feature-flag-service:8080/flags/DISABLE_RATE_LIMITING
-curl -X DELETE http://feature-flag-service:8080/flags/BYPASS_VALIDATION
-curl -X DELETE http://feature-flag-service:8080/flags/ENABLE_DEBUG_LOGGING
-curl -X DELETE http://feature-flag-service:8080/flags/USE_LEGACY_API
-
-# Rimuovi dal codice
-# Prima: cerca tutti i riferimenti
-grep -r "SKIP_AUTH_FOR_TESTING" src/
-src/middleware/auth.js:    if (featureFlags.SKIP_AUTH_FOR_TESTING) {
-src/middleware/auth.js:      return next(); // Skip auth for testing
-src/middleware/auth.js:    }
-
-grep -r "DISABLE_RATE_LIMITING" src/
-src/middleware/rate-limit.js:    if (featureFlags.DISABLE_RATE_LIMITING) {
-src/middleware/rate-limit.js:      return next(); // No rate limiting
-src/middleware/rate-limit.js:    }
-
-# Rimuovi il codice morto
-cat > src/middleware/auth.js << 'EOF'
-// Auth middleware - no more skip flags
-function authMiddleware(req, res, next) {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-  // Validate token...
-  next();
-}
-EOF
-
-# Deploy
-kubectl rollout restart deployment/order-service
-kubectl rollout restart deployment/auth-service
-```
-
-**ME**: Flag pericolosi rimossi. Codice pulito.
-
-**TL**: E GLI ALTRI?!
-
-**ME**: Li analizzo. E decido se rimuoverli o documentarli.
-
-**TL**: E IL FLAG CHE HA CAUSATO IL PROBLEMA?!
-
-**ME**: STRICT_PROMO_VALIDATION? Rimosso anche quello.
-
-**TL**: E IL FILE LEGACY?!
-
-**ME**: Lo rimuovo ora.
-
-**TERMINALE**:
-```
-# Rimuovi file legacy
-rm config/legacy-flags.yaml
-
-# Verifica
-ls config/legacy-flags.yaml
-ls: cannot access 'config/legacy-flags.yaml': No such file or directory
-
-# Commit
-git add -A
-git commit -m "Remove legacy feature flags and dangerous flags"
-git push
-```
-
-**ME**: File legacy rimosso. E committato.
-
-**TL**: E IL DEPLOYMENT-BOT?!
-
-**ME**: Lo configuro per non leggere file legacy.
-
-**TL**: E LA PROSSIMA VOLTA?!
-
-**ME**: La prossima volta... aggiungo un processo. Per i feature flag vecchi.
-
-Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Flag pericolosi: rimossi
-- Codice: pulito
-- File legacy: eliminato
-- Deployment-bot: da configurare
-
-E tutto era pulito. Ma la lezione era chiara. I feature flag si accumulano. E vanno rimossi. E il codice va pulito. Amen.
-
----
-
-**Martedì - Il Processo**
-
-Martedì. Ho creato un processo per i feature flag. Per evitare che si accumulino di nuovo.
-
-**TERMINALE**:
-```
-# Crea script di audit
-cat > scripts/feature-flag-audit.sh << 'EOF'
-#!/bin/bash
-
-# Feature Flag Audit Script
-# Controlla i feature flag più vecchi di 90 giorni
-
-MAX_AGE_DAYS=90
-FLAGS=$(curl -s http://feature-flag-service:8080/flags | jq -r '.flags | keys[]')
-
-for flag in $FLAGS; do
-  created=$(curl -s http://feature-flag-service:8080/flags/$flag | jq -r '.created_at')
-  age=$(( ($(date +%s) - $(date -d "$created" +%s)) / 86400 ))
-  
-  if [ $age -gt $MAX_AGE_DAYS ]; then
-    echo "⚠️  Flag $flag is $age days old (created: $created)"
-    description=$(curl -s http://feature-flag-service:8080/flags/$flag | jq -r '.description')
-    if [ "$description" == "null" ] || [ -z "$description" ]; then
-      echo "   ❌ NO DESCRIPTION - HIGH RISK"
-    fi
-  fi
+# Cerca riferimenti nel codice
+for flag in $(curl -s "https://app.launchdarkly.com/api/v2/flags/default" -H "Authorization: $LD_API_KEY" | jq -r '.items[].key'); do
+  echo "=== $flag ==="
+  grep -r "$flag" src/ --include="*.js" --include="*.ts" | wc -l
 done
-EOF
 
-chmod +x scripts/feature-flag-audit.sh
+# Risultati
+=== use-new-pricing-v2 ===
+45 riferimenti
 
-# Crea GitHub Action per audit automatico
-cat > .github/workflows/feature-flag-audit.yml << 'EOF'
-name: Feature Flag Audit
-on:
-  schedule:
-    - cron: '0 9 * * MON'  # Ogni lunedì alle 9:00
-  workflow_dispatch:
+=== use-legacy-pricing ===
+12 riferimenti
 
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Run Feature Flag Audit
-        run: |
-          chmod +x scripts/feature-flag-audit.sh
-          ./scripts/feature-flag-audit.sh > audit-report.txt
-          
-      - name: Create Issue if Old Flags Found
-        if: grep -q "⚠️" audit-report.txt
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const report = fs.readFileSync('audit-report.txt', 'utf8');
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '🚨 Feature Flags da Rimuovere',
-              body: `I seguenti feature flag sono più vecchi di 90 giorni:\n\n\`\`\`\n${report}\n\`\`\``,
-              labels: ['tech-debt', 'feature-flags']
-            });
-EOF
+=== use-pricing-v1-fallback ===
+8 riferimenti
 
-# Crea documentazione
-cat > docs/feature-flag-lifecycle.md << 'EOF'
-## Feature Flag Lifecycle
+=== enable-dark-mode ===
+23 riferimenti
 
-### Regole
+=== use-new-checkout-flow ===
+67 riferimenti
 
-1. **Ogni feature flag DEVE avere una descrizione.**
-2. **Ogni feature flag DEVE avere una data di scadenza.**
-3. **I feature flag DEVONO essere rimossi entro 90 giorni dalla release.**
-4. **I feature flag pericolosi DEVONO essere rimossi immediatamente dopo l'uso.**
+=== enable-beta-features ===
+34 riferimenti
 
-### Processo
+=== use-legacy-auth ===
+3 riferimenti
 
-1. **Creazione**: Aggiungi il flag con descrizione e data di scadenza.
-2. **Attivazione**: Attiva il flag per il testing.
-3. **Release**: Rilascia la feature al 100% degli utenti.
-4. **Pulizia**: Rimuovi il flag dal codice e dal sistema.
+=== enable-new-dashboard ===
+89 riferimenti
 
-### Audit
+=== use-experimental-cache ===
+2 riferimenti
 
-- Ogni lunedì: audit automatico dei flag > 90 giorni.
-- Ogni flag vecchio genera un issue GitHub.
-- Il team DEVE rimuovere o documentare i flag vecchi.
+=== enable-logging-v2 ===
+56 riferimenti
+```
 
-### Template per nuovi flag
+**ME**: Ci sono flag con pochi riferimenti. "use-legacy-auth" ha solo 3 riferimenti. "use-experimental-cache" ha solo 2.
 
-```json
+**TL**: E SONO DISATTIVATI?!
+
+**ME**: Sì. Da mesi. O anni.
+
+**TL**: E POSSIAMO RIMUOVERLI?!
+
+**ME**: Sì. Ma prima devo verificare che non servano.
+
+**TL**: E COME?!
+
+**ME**: Controllo quando sono stati usati l'ultima volta.
+
+**TERMINALE**:
+```
+# Controlla utilizzo negli ultimi 30 giorni
+for flag in "use-legacy-auth" "use-experimental-cache" "enable-beta-features"; do
+  echo "=== $flag ==="
+  curl -s "https://app.launchdarkly.com/api/v2/flags/default/$flag/metrics" -H "Authorization: $LD_API_KEY" | jq '.evaluations'
+done
+
+# Risultati
+=== use-legacy-auth ===
 {
-  "name": "MY_NEW_FEATURE",
-  "description": "Enable new feature X - remove after v2.1 release",
-  "expiration": "2027-03-16",
-  "created_by": "your-name",
-  "created_at": "2027-01-16"
+  "evaluations": 0,
+  "lastEvaluation": "2025-06-15T10:00:00Z"
+}
+
+=== use-experimental-cache ===
+{
+  "evaluations": 0,
+  "lastEvaluation": "2024-12-01T14:00:00Z"
+}
+
+=== enable-beta-features ===
+{
+  "evaluations": 0,
+  "lastEvaluation": "2025-09-20T09:00:00Z"
 }
 ```
-EOF
-```
 
-**TL**: Hai creato il processo?
-
-**ME**: Sì. Audit automatico ogni lunedì. Issue per i flag vecchi. Documentazione obbligatoria.
-
-**TL**: E SE NESSUNO RISPONDE ALL'ISSUE?!
-
-**ME**: Allora... l'issue resta aperto. E il TL lo vede.
-
-**TL**: E SE IL TL NON LO VEDE?!
-
-**ME**: Allora... prega.
-
-**TL**: E I FLAG PERICOLOSI?!
-
-**ME**: Quelli li ho rimossi tutti. E ho aggiunto un check per i flag con nomi pericolosi.
-
-**TERMINALE**:
-```
-# Aggiungi check per flag pericolosi
-cat > scripts/check-dangerous-flags.sh << 'EOF'
-#!/bin/bash
-
-DANGEROUS_PATTERNS=(
-  "SKIP"
-  "BYPASS"
-  "DISABLE"
-  "NO_AUTH"
-  "NO_VALIDATION"
-  "DEBUG"
-  "TEST"
-)
-
-FLAGS=$(curl -s http://feature-flag-service:8080/flags | jq -r '.flags | keys[]')
-
-for flag in $FLAGS; do
-  for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-    if [[ "$flag" == *"$pattern"* ]]; then
-      echo "🚨 DANGEROUS FLAG DETECTED: $flag"
-      echo "   This flag should be removed immediately!"
-    fi
-  done
-done
-EOF
-```
+**ME**: Tre flag non sono stati usati da mesi.
 
 **TL**: E QUINDI?!
 
-**ME**: E quindi... la prossima volta non succede. O quasi.
+**ME**: E quindi... li rimuovo.
+
+**TERMINALE**:
+```
+# Rimuovi flag non utilizzati
+curl -X DELETE "https://app.launchdarkly.com/api/v2/flags/default/use-legacy-auth" -H "Authorization: $LD_API_KEY"
+curl -X DELETE "https://app.launchdarkly.com/api/v2/flags/default/use-experimental-cache" -H "Authorization: $LD_API_KEY"
+curl -X DELETE "https://app.launchdarkly.com/api/v2/flags/default/enable-beta-features" -H "Authorization: $LD_API_KEY"
+
+# Rimuovi codice morto
+grep -rl "use-legacy-auth" src/ --include="*.js" --include="*.ts" | xargs sed -i '/use-legacy-auth/d'
+grep -rl "use-experimental-cache" src/ --include="*.js" --include="*.ts" | xargs sed -i '/use-experimental-cache/d'
+grep -rl "enable-beta-features" src/ --include="*.js" --include="*.ts" | xargs sed -i '/enable-beta-features/d'
+
+# Commit
+git add .
+git commit -m "Rimuovi feature flag non utilizzati"
+git push
+```
+
+**ME**: Tre flag rimossi. E il codice morto.
+
+**TL**: E GLI ALTRI?!
+
+**ME**: Gli altri servono. Ma li documento.
+
+**TL**: E COME?!
+
+**ME**: Aggiungo una data di scadenza. E un owner.
+
+**TERMINALE**:
+```
+# Aggiungi metadata ai flag
+for flag in "use-legacy-pricing" "use-pricing-v1-fallback"; do
+  curl -X PATCH "https://app.launchdarkly.com/api/v2/flags/default/$flag" \
+    -H "Authorization: $LD_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "description": "DEPRECATED: Remove after 2027-02-01. Owner: pricing-team@company.com",
+      "tags": ["deprecated", "remove-by-2027-02-01"]
+    }'
+done
+```
+
+**ME**: Due flag marcati come deprecated. Con data di rimozione.
+
+**TL**: E SE NON VENGONO RIMOSSI?!
+
+**ME**: Allora... l'alert ci avvisa.
+
+**TL**: QUALE ALERT?!
+
+**ME**: Lo creo ora.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Audit: automatico
-- Issue: automatici
-- Check: pericolosi
-- Documentazione: obbligatoria
+- Flag rimossi: 3
+- Flag deprecati: 2
+- Codice morto: rimosso
+- Alert: da creare
 
-E tutto funzionava. Ma avevo imparato una lezione. La lezione che i feature flag vanno gestiti. E che i processi sono essenziali. E che la documentazione è obbligatoria. Amen.
+E tutto era più pulito. Ma avevo imparato una lezione. La lezione che i feature flag vanno rimossi. E che il debito tecnico va pagato. Amen.
+
+---
+
+**Martedì - L'Alert**
+
+Martedì. Ho creato l'alert per i feature flag vecchi.
+
+**TERMINALE**:
+```
+# Crea alert per feature flag vecchi
+cat > /etc/prometheus/alerts/feature-flags.yml << 'EOF'
+groups:
+  - name: feature-flags
+    rules:
+      - alert: FeatureFlagOlderThan90Days
+        expr: |
+          feature_flag_age_days > 90
+          and
+          feature_flag_on == 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag {{ $labels.flag }} is older than 90 days and disabled"
+          description: "Feature flag {{ $labels.flag }} was created {{ $value }} days ago and is disabled. Consider removing it."
+
+      - alert: FeatureFlagUnusedFor30Days
+        expr: |
+          feature_flag_last_evaluation_days > 30
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag {{ $labels.flag }} has not been evaluated for 30 days"
+          description: "Feature flag {{ $labels.flag }} was last evaluated {{ $value }} days ago. Consider removing it."
+
+      - alert: FeatureFlagDeprecatedPastDue
+        expr: |
+          feature_flag_deprecated == 1
+          and
+          feature_flag_removal_date < time()
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Deprecated feature flag {{ $labels.flag }} is past due for removal"
+          description: "Feature flag {{ $labels.flag }} was marked for removal but is still present. Remove it now."
+EOF
+
+# Aggiungi metriche
+cat > src/lib/feature-flag-metrics.js << 'EOF'
+const prometheus = require('prom-client');
+const LaunchDarkly = require('launchdarkly-node-server-sdk');
+
+const ldClient = LaunchDarkly.init(process.env.LD_SDK_KEY);
+
+const featureFlagAge = new prometheus.Gauge({
+  name: 'feature_flag_age_days',
+  help: 'Age of feature flag in days',
+  labelNames: ['flag', 'owner'],
+});
+
+const featureFlagLastEvaluation = new prometheus.Gauge({
+  name: 'feature_flag_last_evaluation_days',
+  help: 'Days since last evaluation',
+  labelNames: ['flag'],
+});
+
+const featureFlagOn = new prometheus.Gauge({
+  name: 'feature_flag_on',
+  help: 'Feature flag is on: 0=off, 1=on',
+  labelNames: ['flag'],
+});
+
+const featureFlagDeprecated = new prometheus.Gauge({
+  name: 'feature_flag_deprecated',
+  help: 'Feature flag is deprecated: 0=no, 1=yes',
+  labelNames: ['flag'],
+});
+
+async function collectFeatureFlagMetrics() {
+  const flags = await ldClient.allFlagsState({ key: 'metrics' });
+  const now = Date.now();
+
+  for (const [flag, value] of Object.entries(flags)) {
+    const metadata = await getFlagMetadata(flag);
+    
+    featureFlagAge.set({ flag, owner: metadata.owner || 'unknown' }, 
+      (now - new Date(metadata.created).getTime()) / (1000 * 60 * 60 * 24));
+    
+    featureFlagOn.set({ flag }, value ? 1 : 0);
+    
+    featureFlagDeprecated.set({ flag }, metadata.deprecated ? 1 : 0);
+  }
+}
+
+module.exports = { collectFeatureFlagMetrics };
+EOF
+
+# Configura cron job
+cat > /etc/cron.d/feature-flag-metrics << 'EOF'
+*/30 * * * * node /app/src/lib/feature-flag-metrics.js
+EOF
+```
+
+**TL**: Hai creato l'alert?
+
+**ME**: Sì. Alert per flag vecchi. Alert per flag non usati. Alert per flag deprecati scaduti.
+
+**TL**: E QUINDI?!
+
+**ME**: E quindi... vediamo quando i feature flag diventano debito tecnico.
+
+**TL**: E SE NON LI RIMUOVIAMO?!
+
+**ME**: Allora... l'alert ci ricorda. Ogni giorno. Finché non lo facciamo.
+
+**TL**: E SE LO IGNORIAMO?!
+
+**ME**: Allora... siamo fottuti. Ma almeno sappiamo di essere fottuti.
+
+Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Alert: configurati
+- Metriche: attive
+- Cron: ogni 30 minuti
+- Feature flag: monitorati
+
+E tutto funzionava. Ma avevo imparato una lezione. La lezione che i feature flag vanno monitorati. E che gli alert salvano. E che il debito tecnico va pagato. Amen.
 
 ---
 
 **Mercoledì - L'Educazione**
 
-Mercoledì. Ho educato il team. Non con rabbia. Con pazienza.
+Mercoledì. Ho educato JN. Di nuovo. Non con rabbia. Con pazienza.
 
-**ME**: Team, riunione.
+**ME**: JN, vieni qui.
 
 **JN**: Sì?
 
-**ME**: Ieri abbiamo perso 8923 ordini. Per un feature flag dimenticato.
+**ME**: Siediti.
 
-**JN**: Un feature flag?!
+**JN**: (si siede) È per i feature flag?
 
-**ME**: Sì. STRICT_PROMO_VALIDATION. Creato nel marzo 2025. Mai rimosso.
+**ME**: Sì. E no.
 
-**JN**: E CHE FACEVA?!
+**JN**: Cosa significa?
 
-**ME**: Validava i promo code. Ma i promo code non esistono più.
+**ME**: Significa che i feature flag toccati sono stati un disastro. Ma sono anche stati un'opportunità.
 
-**JN**: Ah.
+**JN**: Un'opportunità?
 
-**ME**: E quando è stato attivato, ha bloccato tutto.
+**ME**: Sì. Per imparare.
 
-**JN**: E CHI L'HA ATTIVATO?!
+**JN**: Imparare cosa?
 
-**ME**: Il deployment-bot. Leggendo un file legacy.
-
-**JN**: E PERCHÉ NON L'ABBIAMO RIMOSSO?!
-
-**ME**: Perché nessuno lo ricordava. Ecco perché ora abbiamo un processo.
-
-**JN**: Un processo?
-
-**ME**: Sì. Cinque regole. Primo: ogni feature flag DEVE avere una descrizione.
+**ME**: Cinque cose. Primo: i feature flag vanno testati in staging.
 
 **JN**: Sempre?
 
-**ME**: Sempre. Senza descrizione, non sai cosa fa. E se non sai cosa fa, non sai se rimuoverlo.
+**ME**: Sempre. Mai toccare un flag in produzione senza testarlo prima.
+
+**JN**: E se non c'è staging?
+
+**ME**: Allimenti lo crei. O chiedi. Ma non tocchi la produzione.
 
 **JN**: Ok.
 
-**ME**: Secondo: ogni feature flag DEVE avere una data di scadenza.
+**ME**: Secondo: i feature flag vanno documentati.
 
-**JN**: Scadenza?
+**JN**: Documentati?
 
-**ME**: Sì. Quando deve essere rimosso. Di solito 90 giorni dopo la release.
+**ME**: Sì. Con owner. Con data di creazione. Con data di rimozione prevista.
 
-**JN**: Ok.
+**JN**: E se non so quando rimuoverlo?
 
-**ME**: Terzo: i feature flag DEVONO essere rimossi entro 90 giorni.
-
-**JN**: E SE NON LO FACCIAMO?!
-
-**ME**: Allora l'audit lo trova. E crea un issue. E tu DEVI rispondere.
+**ME**: Allimenti metti una data stimata. E la aggiorni quando sai di più.
 
 **JN**: Ok.
 
-**ME**: Quarto: i flag pericolosi DEVONO essere rimossi immediatamente.
+**ME**: Terzo: i feature flag vanno rimossi dopo il rilascio.
 
-**JN**: Pericolosi?
+**JN**: Sempre?
 
-**ME**: Sì. SKIP_AUTH. BYPASS_VALIDATION. DISABLE_RATE_LIMITING. Questi nomi sono vietati.
+**ME**: Sempre. Una feature è stata rilasciata? Il flag va rimosso. Entro 2 settimane.
 
-**JN**: E SE NE HO BISOGNO?!
+**JN**: E se non posso?
 
-**ME**: Allora lo usi in locale. E LO RIMUOVI prima del commit.
+**ME**: Allora lo marchi come deprecated. E lo rimuovi dopo.
 
 **JN**: Ok.
 
-**ME**: Quinto: documenta tutto. Cosa fa il flag. Quando è stato creato. Quando deve essere rimosso.
+**ME**: Quarto: non attivare flag a caso.
 
-**JN**: E SE NON HO TEMPO?!
+**JN**: Non l'ho fatto a caso!
 
-**ME**: Allora... non crei il flag. E fai la feature senza flag.
+**ME**: Hai attivato tre flag contemporaneamente. Per "vedere quale aveva la precedenza".
+
+**JN**: Era un test!
+
+**ME**: IN PRODUZIONE! SUI PREZZI!
+
+**JN**: Ok. Ho capito.
+
+**ME**: Quinto: chiedi prima di toccare un flag che non conosci.
+
+**JN**: E se non c'è nessuno?
+
+**ME**: Allimenti controlli la documentazione. E l'owner. E se non sai, non tocchi.
+
+**JN**: E se devo toccarlo?
+
+**ME**: Allimenti chiami l'owner. E chiedi. E se l'owner non c'è più, chiedi al TL.
+
+**JN**: Ok.
+
+**ME**: E la prossima volta, pensa. Prima di toccare un feature flag, pensa a cosa succede se è sbagliato.
+
+**JN**: E se non so se è sbagliato?
+
+**ME**: Allimenti chiedi. Sempre meglio chiedere che rompere.
 
 JN mi ha guardato. Io guardavo JN. JN guardava il terminale. Il terminale mostrava:
-- Regole: 5
-- Audit: automatico
-- Flag pericolosi: rimossi
+- Feature flag: documentati
+- Alert: attivi
 - Educazione: completata
+- JN: più saggio
 
-E tutto era chiaro. Ma le cose che sembrano chiare sono le più pericolose. Perché i junior dimenticano. E i senior dimenticano. E tutti dimenticano. E l'unico modo per non far crollare il sistema è avere processi. E audit. E documentazione. Amen.
+E tutto era risolto. Ma le cose che sembrano risolte sono le più pericolose. Perché i junior sbagliano. E i senior sbagliano. E tutti sbagliano. E l'unico modo per non far crollare il sistema è avere processi. E documentazione. E educazione. Amen.
 
 ---
 
 **Giovedì - La Pulizia**
 
-Giovedì. Ho pulito tutti i feature flag vecchi. E rimosso il codice morto.
+Giovedì. Ho pulito tutti i feature flag. E il codice morto.
 
 **TERMINALE**:
 ```
 # Lista flag rimanenti
-curl -s http://feature-flag-service:8080/flags | jq '.flags | keys'
-[
-  "NEW_CHECKOUT_FLOW",
-  "LEGACY_PAYMENT_GATEWAY",
-  "EXPERIMENTAL_SEARCH",
-  "OLD_EMAIL_PROVIDER"
-]
-
-# Analizza ogni flag
-for flag in NEW_CHECKOUT_FLOW LEGACY_PAYMENT_GATEWAY EXPERIMENTAL_SEARCH OLD_EMAIL_PROVIDER; do
-  echo "=== $flag ==="
-  curl -s http://feature-flag-service:8080/flags/$flag | jq '{created_at, description, enabled}'
-done
+curl -s "https://app.launchdarkly.com/api/v2/flags/default" -H "Authorization: $LD_API_KEY" | jq '.items[] | {key, created, on}'
 
 # Risultati
-=== NEW_CHECKOUT_FLOW ===
-{"created_at": "2025-06-20", "description": "New checkout flow - remove after v2.0 release", "enabled": true}
-
-=== LEGACY_PAYMENT_GATEWAY ===
-{"created_at": "2024-11-10", "description": null, "enabled": false}
-
-=== EXPERIMENTAL_SEARCH ===
-{"created_at": "2025-01-05", "description": "Experimental search - remove after testing", "enabled": false}
-
-=== OLD_EMAIL_PROVIDER ===
-{"created_at": "2024-02-28", "description": null, "enabled": false}
-
-# Controlla se NEW_CHECKOUT_FLOW è ancora necessario
-grep -r "NEW_CHECKOUT_FLOW" src/
-src/services/checkout.js:    if (featureFlags.NEW_CHECKOUT_FLOW) {
-src/services/checkout.js:      return newCheckoutFlow(order);
-src/services/checkout.js:    } else {
-src/services/checkout.js:      return legacyCheckoutFlow(order);
-src/services/checkout.js:    }
-
-# Controlla metriche
-kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum(rate(checkout_requests_total{flow="new"}[24h])) / sum(rate(checkout_requests_total[24h]))'
-{status: "success", data: {result: [{value: ["0.98"]}]}}  # 98% usa il nuovo flow
-
-# Il nuovo flow è usato al 98%. Possiamo rimuovere il flag e il codice legacy.
-```
-
-**ME**: NEW_CHECKOUT_FLOW è usato al 98%. Posso rimuoverlo e tenere solo il nuovo flow.
-
-**TL**: E IL CODICE LEGACY?!
-
-**ME**: Lo rimuovo. E semplifico.
-
-**TERMINALE**:
-```
-# Rimuovi feature flag e codice legacy
-cat > src/services/checkout.js << 'EOF'
-// Checkout service - new flow only
-async function processCheckout(order) {
-  // Validate order
-  if (!order.items || order.items.length === 0) {
-    throw new Error('Empty order');
-  }
-  
-  // Calculate total
-  const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  
-  // Process payment
-  await processPayment(order.paymentMethod, total);
-  
-  // Create order
-  return await createOrder(order, total);
+{
+  "key": "use-new-pricing-v2",
+  "created": "2025-07-15T10:00:00Z",
+  "on": true
 }
+{
+  "key": "use-legacy-pricing",
+  "created": "2024-06-01T08:00:00Z",
+  "on": false,
+  "deprecated": true,
+  "removalDate": "2027-02-01"
+}
+{
+  "key": "use-pricing-v1-fallback",
+  "created": "2025-03-20T14:00:00Z",
+  "on": false,
+  "deprecated": true,
+  "removalDate": "2027-02-01"
+}
+{
+  "key": "enable-dark-mode",
+  "created": "2024-02-15T09:00:00Z",
+  "on": true
+}
+{
+  "key": "use-new-checkout-flow",
+  "created": "2024-09-10T11:00:00Z",
+  "on": true
+}
+{
+  "key": "enable-new-dashboard",
+  "created": "2024-04-01T10:00:00Z",
+  "on": true
+}
+{
+  "key": "enable-logging-v2",
+  "created": "2024-01-10T09:00:00Z",
+  "on": true
+}
+
+# Aggiungi owner a tutti i flag
+for flag in "use-new-pricing-v2" "enable-dark-mode" "use-new-checkout-flow" "enable-new-dashboard" "enable-logging-v2"; do
+  curl -X PATCH "https://app.launchdarkly.com/api/v2/flags/default/$flag" \
+    -H "Authorization: $LD_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"tags": ["owner:platform-team"]}'
+done
+
+# Crea documentazione
+cat > docs/feature-flags.md << 'EOF'
+# Feature Flags
+
+## Flag Attivi
+
+| Flag | Creato | Owner | Scopo |
+|------|--------|-------|-------|
+| use-new-pricing-v2 | 2025-07-15 | pricing-team | Nuovo sistema di prezzi |
+| enable-dark-mode | 2024-02-15 | frontend-team | Tema scuro |
+| use-new-checkout-flow | 2024-09-10 | checkout-team | Nuovo flusso checkout |
+| enable-new-dashboard | 2024-04-01 | frontend-team | Nuova dashboard |
+| enable-logging-v2 | 2024-01-10 | platform-team | Nuovo sistema di logging |
+
+## Flag Deprecated (da rimuovere)
+
+| Flag | Creato | Rimozione prevista | Note |
+|------|--------|-------------------|------|
+| use-legacy-pricing | 2024-06-01 | 2027-02-01 | Sistema prezzi legacy |
+| use-pricing-v1-fallback | 2025-03-20 | 2027-02-01 | Fallback prezzi V1 |
+
+## Regole
+
+1. Ogni flag deve avere un owner
+2. Ogni flag deve avere una data di rimozione prevista
+3. I flag vanno rimossi entro 2 settimane dal rilascio
+4. I flag disattivati da più di 30 giorni vanno rimossi
+5. Mai toccare un flag in produzione senza testare in staging
 EOF
-
-# Rimuovi flag
-curl -X DELETE http://feature-flag-service:8080/flags/NEW_CHECKOUT_FLOW
-
-# Rimuovi altri flag inutilizzati
-curl -X DELETE http://feature-flag-service:8080/flags/LEGACY_PAYMENT_GATEWAY
-curl -X DELETE http://feature-flag-service:8080/flags/EXPERIMENTAL_SEARCH
-curl -X DELETE http://feature-flag-service:8080/flags/OLD_EMAIL_PROVIDER
-
-# Verifica
-curl -s http://feature-flag-service:8080/flags | jq '.flags | keys'
-[]
 ```
 
-**ME**: Tutti i feature flag rimossi. Codice semplificato.
+**TL**: Hai documentato tutto?
 
-**TL**: E ORA?!
+**ME**: Sì. Ogni flag ha un owner. E una data di rimozione prevista.
 
-**ME**: Ora il sistema è pulito. Nessun feature flag. Nessun codice morto.
+**TL**: E I FLAG DEPRECATI?!
 
-**TL**: E LA PROSSIMA VOLTA?!
+**ME**: Due flag deprecati. Da rimuovere entro febbraio.
 
-**ME**: La prossima volta... i flag vengono creati con descrizione e scadenza. E l'audit li controlla.
+**TL**: E CHI LI RIMUOVE?!
 
-**TL**: E SE NESSUNO RISPONDE ALL'AUDIT?!
+**ME**: Il pricing team. Ho creato un ticket.
 
-**ME**: Allora... il TL riceve una notifica. E interviene.
+**TL**: E SE NON LO FANNO?!
+
+**ME**: Allora... l'alert ci avvisa. E li rimuoviamo noi.
+
+**TL**: E JN?!
+
+**ME**: JN... ha imparato. Spero.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Feature flag: 0
-- Codice morto: 0
-- Audit: attivo
-- Processo: documentato
+- Feature flag: documentati
+- Owner: assegnati
+- Deprecated: 2
+- Documentazione: completa
 
-E tutto era pulito. Ma avevo imparato una lezione. La lezione che i feature flag sono debito tecnico. E che il debito va pagato. E che la pulizia è essenziale. Amen.
+E tutto era in ordine. Ma avevo imparato una lezione. La lezione che i feature flag vanno gestiti. E documentati. E rimossi. E che JN va educato. Amen.
 
 ---
 
@@ -827,86 +871,72 @@ E tutto era pulito. Ma avevo imparato una lezione. La lezione che i feature flag
 Venerdì. Ho documentato. Per i posteri. Per i futuri sviluppatori che avrebbero dimenticato i feature flag.
 
 ```markdown
-## Incident #FLAG-001: Il Feature Flag Che Nessuno Ricordava
+## Incident #FEATURE-FLAG-001: Il Feature Flag Che Nessuno Ricordava
 
-**Data incident**: Lunedì 16 gennaio 2027, 08:45
-**Autore**: unknown
-**Servizio**: order-service
-**Problema**: Feature flag dimenticato attivato per sbaglio
-**Causa**: Deployment-bot ha letto file legacy con flag attivo
-**Nome flag**: STRICT_PROMO_VALIDATION
-**Data creazione**: 15 marzo 2025
-**Tempo in sistema**: 22 mesi
-**Ordini persi**: 8923
-**Valore potenziale**: €403,598.29
-**Tempo di risoluzione**: 30 minuti
+**Data incident**: Lunedì 16 gennaio 2027, 09:30
+**Autore**: JN
+**Servizio**: pricing-service
+**Problema**: Feature flag attivati a caso in produzione
+**Causa**: Test in produzione senza staging
+**Feature flag toccati**: 3
+**Feature flag totali**: 10
+**Feature flag vecchi di >1 anno**: 4
+**Feature flag mai usati**: 3
+**Clienti affetti**: ~500
+**Tempo di risoluzione**: 2 ore
 **Downtime**: 0 (servizio parzialmente funzionante)
-**Reazione UL**: "400.000 euro?!"
-**Reazione TL**: "Un feature flag?!"
-**Reazione CTO**: "I flag vanno rimossi."
-**Soluzione**: Flag rimosso + audit automatico + processo documentato
+**Reazione UL**: "Prezzi a caso?!"
+**Reazione TL**: "18 mesi?!"
+**Reazione CTO**: "I feature flag vanno rimossi."
+**Soluzione**: Flag fixati + flag rimossi + documentazione + alert
 **Lezione imparata**: I FEATURE FLAG VANNO RIMOSSI. SEMPRE.
 
 **Regole per i feature flag**:
-1. Ogni feature flag DEVE avere una descrizione.
-2. Ogni feature flag DEVE avere una data di scadenza.
-3. I feature flag DEVONO essere rimossi entro 90 giorni dalla release.
-4. I flag pericolosi (SKIP, BYPASS, DISABLE) sono VIETATI.
-5. L'audit automatico controlla i flag ogni lunedì.
-6. I flag vecchi generano issue GitHub automatici.
-7. Il team DEVE rispondere agli issue entro 7 giorni.
-8. I feature flag sono debito tecnico. E il debito va pagato. Amen.
+1. I feature flag VANNO testati in staging. MAI in produzione.
+2. I feature flag VANNO documentati. Con owner e data di rimozione.
+3. I feature flag VANNO rimossi dopo il rilascio. Entro 2 settimane.
+4. I feature flag disattivati da >30 giorni VANNO rimossi.
+5. I feature flag vecchi di >90 giorni VANNO auditati.
+6. Non attivare flag a caso. Chiedi prima.
+7. Non toccare flag che non conosci. Chiedi all'owner.
+8. I feature flag sono debito tecnico. Se non li paghi, ti presentano il conto. Amen.
 
-**Come creare un feature flag correttamente**:
-```json
-{
-  "name": "MY_NEW_FEATURE",
-  "description": "Enable new feature X - remove after v2.1 release",
-  "expiration": "2027-04-16",
-  "created_by": "your-name",
-  "created_at": "2027-01-16"
-}
-```
-
-**Come rimuovere un feature flag**:
+**Come gestire i feature flag**:
 ```bash
-# 1. Verifica che il flag non sia più necessario
-curl -s http://feature-flag-service:8080/flags/MY_FLAG | jq '.enabled'
-# Se false, procedi
+# Lista flag
+curl -s "https://app.launchdarkly.com/api/v2/flags/default" -H "Authorization: $LD_API_KEY" | jq '.items[] | {key, created, on}'
 
-# 2. Rimuovi il codice che usa il flag
-# Cerca tutti i riferimenti
-grep -r "MY_FLAG" src/
-# Rimuovi o semplifica il codice
+# Aggiungi owner
+curl -X PATCH "https://app.launchdarkly.com/api/v2/flags/default/FLAG_NAME" \
+  -H "Authorization: $LD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"tags": ["owner:TEAM-NAME"], "description": "Scopo del flag. Rimuovere entro YYYY-MM-DD"}'
 
-# 3. Rimuovi il flag dal sistema
-curl -X DELETE http://feature-flag-service:8080/flags/MY_FLAG
+# Rimuovi flag
+curl -X DELETE "https://app.launchdarkly.com/api/v2/flags/default/FLAG_NAME" -H "Authorization: $LD_API_KEY"
 
-# 4. Commit e deploy
-git add -A
-git commit -m "Remove feature flag MY_FLAG"
-git push
+# Cerca riferimenti nel codice
+grep -r "FLAG_NAME" src/ --include="*.js" --include="*.ts"
 ```
 
-**Come configurare l'audit automatico**:
+**Come configurare alert per feature flag**:
 ```yaml
-# .github/workflows/feature-flag-audit.yml
-name: Feature Flag Audit
-on:
-  schedule:
-    - cron: '0 9 * * MON'
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./scripts/feature-flag-audit.sh
+groups:
+  - name: feature-flags
+    rules:
+      - alert: FeatureFlagOlderThan90Days
+        expr: feature_flag_age_days > 90 and feature_flag_on == 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag {{ $labels.flag }} is old and disabled"
 ```
 ```
 
-Il TL ha letto la documentazione. Il TL ha sorriso. Il TL ha detto: "Quindi hai imparato che i feature flag vanno rimossi. E che l'audit è essenziale. E che la documentazione è obbligatoria. E che 8923 ordini persi sono tanti. E che 400.000 euro sono tanti. E che la prossima volta non succede. O quasi. Amen."
+Il TL ha letto la documentazione. Il TL ha sorriso. Il TL ha detto: "Quindi hai imparato che i feature flag vanno rimossi. E che vanno documentati. E che vanno testati in staging. E che JN va educato. E che 18 mesi sono tanti per un flag. E che la prossima volta non succede. O quasi. Amen."
 
-**ME**: Sì. E la lezione più importante è questa: i feature flag sono come i paracadute di riserva. Se non li controlli, non sai se funzionano. E se non li rimuovi, diventano bombe a orologeria. E un giorno esplodono. E tu ti chiedi: "Com'è possibile?" E la risposta è semplice: perché nessuno li ricordava. E il flag era lì. Da 22 mesi. E nessuno sapeva cosa faceva. E quando è stato attivato, ha fatto quello che era programmato per fare. E quello che era programmato per fare era bloccare gli ordini. E gli ordini sono stati bloccati. E i clienti hanno chiamato. E UL ha chiamato. E tu hai risposto. E hai detto: "Era un feature flag dimenticato." E UL ha detto: "DIMENTICATO?!" E tu hai detto: "Sì. Del marzo 2025." E UL ha detto: "E PERCHÉ ERA ANCORA LÌ?!" E tu hai detto: "Perché nessuno lo ricordava." E la verità è che tutti dimenticano. E l'unico modo per non dimenticare è avere processi. E audit. E documentazione. E la prossima volta, il flag viene rimosso. Entro 90 giorni. O l'audit lo trova. E tu lo rimuovi. Amen.
+**ME**: Sì. E la lezione più importante è questa: i feature flag sono come i prestiti. Se li prendi, devi restituirli. E se non li restituisci, si accumulano. E prima o poi ti presentano il conto. E il conto è che qualcuno li tocca per sbaglio. E il sistema impazzisce. E i clienti chiamano. E UL chiama. E tu rispondi. E dici: "Non abbiamo cambiato nulla." E UL dice: "E ALLORA PERCHÉ I PREZZI SONO SBAGLIATI?!" E tu dici: "Non lo so." E poi scopri che JN ha toccato un flag vecchio di 18 mesi. E che quel flag controllava i prezzi. E che ora i clienti vedono prezzi a caso. E la verità è che i feature flag sono comodi. Ma sono anche pericolosi. E se non li gestisci, ti uccidono. Amen.
 
 ---
 
@@ -914,28 +944,26 @@ Il TL ha letto la documentazione. Il TL ha sorriso. Il TL ha detto: "Quindi hai 
 
 | Voce | Valore |
 |------|--------|
-| Servizio | order-service |
-| Nome flag | STRICT_PROMO_VALIDATION |
-| Autore | unknown |
-| Data creazione | 15/03/2025 |
-| Data incident | 16/01/2027, 08:45 |
-| Tempo in sistema | 22 mesi |
-| Ordini persi | 8923 |
-| Valore potenziale | €403,598.29 |
-| Tempo di risoluzione | 30 minuti |
+| Servizio | pricing-service |
+| Autore | JN |
+| Data incident | 16/01/2027, 09:30 |
+| Feature flag toccati | 3 |
+| Feature flag totali | 10 |
+| Feature flag vecchi >1 anno | 4 |
+| Feature flag mai usati | 3 |
+| Feature flag rimossi | 3 |
+| Feature flag deprecati | 2 |
+| Clienti affetti | ~500 |
+| Tempo di risoluzione | 2 ore |
 | Downtime | 0 (parziale) |
-| Feature flag trovati | 10 |
-| Flag pericolosi | 5 |
-| Flag rimossi | 10 |
-| Codice morto rimosso | ~500 righe |
-| Reazione UL | "400.000 euro?!" |
-| Reazione TL | "Un feature flag?!" |
-| Reazione CTO | "I flag vanno rimossi." |
-| Soluzione | Flag rimossi + audit + processo |
-| Lezione imparata | FLAG = DEBITO TECNICO |
-| **Totale** | **€403,598 potenziali + 10 flag rimossi + 1 processo creato** |
+| Reazione UL | "Prezzi a caso?!" |
+| Reazione TL | "18 mesi?!" |
+| Reazione CTO | "Vanno rimossi." |
+| Soluzione | Flag fixati + rimossi + documentati |
+| Lezione imparata | FEATURE FLAG = RIMUOVERE DOPO RILASCIO |
+| **Totale** | **3 flag rimossi + 2 deprecati + 1 junior educato + alert configurati** |
 
-**Morale**: I feature flag vanno rimossi. Sempre. Dopo che la feature è stata rilasciata. E testata. E verificata. E quando dico "rimossi", intendo eliminati dal codice. Non disabilitati nel pannello di controllo. Non settati a "false" nel file di configurazione. ELIMINATI. Dal codice. Perché un feature flag disabilitato è come una bomba a orologeria. È lì. Pronta a esplodere. E un giorno qualcuno la attiva per sbaglio. O un bot la attiva. O un test la attiva. E la bomba esplode. E tu ti chiedi: "Com'è possibile che il feature flag fosse ancora lì?" E la risposta è semplice: perché nessuno lo ricordava. E il feature flag era lì. Da 22 mesi. E nessuno sapeva cosa faceva. E quando è stato attivato, ha fatto quello che era programmato per fare. E quello che era programmato per fare era bloccare gli ordini. E gli ordini sono stati bloccati. E i clienti hanno chiamato. E UL ha chiamato. E tu hai risposto. E hai detto: "Era un feature flag dimenticato." E UL ha detto: "DIMENTICATO?!" E tu hai detto: "Sì. Del marzo 2025." E UL ha detto: "E PERCHÉ ERA ANCORA LÌ?!" E tu hai detto: "Perché nessuno lo ricordava." E UL ha detto: "E COME FA A ESSERCI DA 22 MESI?!" E tu hai detto: "Perché non avevamo un processo per rimuoverli." E la verità è che i feature flag sono debito tecnico. E il debito va pagato. E se non lo paghi, si accumula. E un giorno esplode. E ti costa 400.000 euro. O di più. E la prossima volta, il flag viene rimosso. Entro 90 giorni. O l'audit lo trova. E tu lo rimuovi. Amen.
+**Morale**: I feature flag vanno rimossi. Sempre. Dopo che la feature è stata rilasciata. E testata. E verificata. E se non li rimuovi, si accumulano. E diventano debito tecnico. E prima o poi qualcuno li tocca per sbaglio. E il sistema impazzisce. E i clienti chiamano. E UL chiama. E tu rispondi. E dici: "Non abbiamo cambiato nulla." E invece qualcosa è cambiato. Il feature flag che nessuno ricordava. Che era lì da 18 mesi. E JN l'ha toccato. E i prezzi sono impazziti. E la verità è che i feature flag sono comodi. Ma sono anche pericolosi. E se non li gestisci, ti uccidono. E la prossima volta, rimuovi il flag. Dopo il rilascio. Sempre. Amen.
 
 ---
 
@@ -945,4 +973,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-migrazione-che-ha-cancellato-la-tabella-sbagliata.md)**
+**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-migration-che-ha-bloccato-tutto.md)**
