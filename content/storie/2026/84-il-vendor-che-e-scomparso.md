@@ -272,4 +272,4 @@ I commenti vengono aggiunti **quando** e, più importante, **se** ho tempo di mo
 
 ---
 
-**[Home](../index.md) | [Precedente](83-la-variabile-che-era-diversa-in-produzione.md)]**
+**[Home](../index.md) | [Precedente](83-la-variabile-che-era-diversa-in-produzione.md) | [Prossima](85-il-certificato-che-e-scaduto-di-sabato.md)]**
