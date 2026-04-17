@@ -2,7 +2,7 @@
 
 **Data**: 27/02/2027
 
-**[Storie 2026](index.md) | [Precedente](105-il-timeout-che-era-zero.md) | [Prossima](107-il-load-balancer-che-non-bilanciava.md)**
+**[Storie 2026](index.md) | [Precedente](105-il-timeout-che-era-zero.md) | [Prossima](107-il-rate-limiter-che-bloccava-i-legittimi.md)**
 
 ---
 
@@ -982,4 +982,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](105-il-timeout-che-era-zero.md) | [Prossima](107-il-load-balancer-che-non-bilanciava.md)**
+**[Storie 2026](index.md) | [Precedente](105-il-timeout-che-era-zero.md) | [Prossima](107-il-rate-limiter-che-bloccava-i-legittimi.md)**
