@@ -2,7 +2,7 @@
 
 **Data**: 24/04/2026
 
-**[Storie 2026](index.md) | [Precedente](113-il-migration-che-ha-cancellato-la-tabella-sbagliata.md) | [Prossima](115-la-query-che-non-aveva-limit.md)**
+**[Storie 2026](index.md) | [Precedente](113-il-migration-che-ha-cancellato-la-tabella-sbagliata.md) | [Prossima](115-il-container-che-non-si-fermava-mai.md)**
 
 ---
 
@@ -807,4 +807,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](113-il-migration-che-ha-cancellato-la-tabella-sbagliata.md) | [Prossima](115-la-query-che-non-aveva-limit.md)**
+**[Storie 2026](index.md) | [Precedente](113-il-migration-che-ha-cancellato-la-tabella-sbagliata.md) | [Prossima](115-il-container-che-non-si-fermava-mai.md)**
