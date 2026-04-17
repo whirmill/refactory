@@ -2,7 +2,7 @@
 
 **Data**: 05/12/2026
 
-**[Storie 2026](index.md) | [Precedente](93-il-log-che-ha-riempito-il-disco.md) | [Prossima](95-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](93-il-log-che-ha-riempito-il-disco.md) | [Prossima](95-il-certificato-scaduto-che-ha-ucciso-tutto.md)**
 
 ---
 
@@ -311,4 +311,4 @@ I commenti vengono aggiunti **quando** e, più importante, **se** ho tempo di mo
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](93-il-log-che-ha-riempito-il-disco.md) | [Prossima](95-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](93-il-log-che-ha-riempito-il-disco.md) | [Prossima](95-il-certificato-scaduto-che-ha-ucciso-tutto.md)**
