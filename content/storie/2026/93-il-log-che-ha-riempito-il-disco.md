@@ -2,7 +2,7 @@
 
 **Data**: 28/11/2026
 
-**[Home](../index.md) | [Precedente](92-il-memory-leak-che-ha-mangiato-la-ram.md)]**
+**[Storie 2026](index.md) | [Precedente](92-il-memory-leak-che-ha-mangiato-la-ram.md) | [Prossima](94-il-database-senza-password.md)**
 
 ---
 
@@ -1215,4 +1215,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](92-il-memory-leak-che-ha-mangiato-la-ram.md)]**
+**[Storie 2026](index.md) | [Precedente](92-il-memory-leak-che-ha-mangiato-la-ram.md) | [Prossima](94-il-database-senza-password.md)**
