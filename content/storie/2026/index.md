@@ -16,6 +16,14 @@
 
 ---
 
+### [Il Certificate Che Non Veniva Rinnovato](108-il-certificate-che-non-veniva-rinnovato.md)
+
+**Data**: 13/03/2027
+
+JN triggera 847 rinnovi di certificato per "testare". Superiamo il rate limit di Let's Encrypt. Il certificato scade. I clienti non possono accedere. E €800 dopo, impariamo che i rate limit vanno rispettati.
+
+---
+
 ### [Il Feature Flag Che Nessuno Ricordava](100-il-feature-flag-che-nessuno-ricordava.md)
 
 **Data**: 16/01/2027
