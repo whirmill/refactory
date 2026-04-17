@@ -28,7 +28,7 @@ JN triggera 847 rinnovi di certificato per "testare". Superiamo il rate limit di
 
 **Data**: 16/01/2027
 
-Un feature flag disabilitato dal Black Friday 2024. JN lo tocca per sbaglio. 847 client bloccati. E 234 flag da auditare. Perché i feature flag vanno rimossi. Sempre.
+Un feature flag del 2023. Senza descrizione. Senza scadenza. Che cambiava i prezzi e dava sconti del 50%. Per tre anni. E €234.567 dopo, impariamo che i feature flag devono morire.
 
 ---
 

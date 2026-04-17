@@ -2,11 +2,11 @@
 
 **Data**: 16/01/2027
 
-**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-il-migration-che-ha-cancellato-tutto.md)**
+**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-migrazione-che-ha-cancellato-la-tabella-sbagliata.md)**
 
 ---
 
-C'è una verità nel feature toggling che tutti conoscono ma nessuno rispetta: i feature flag vanno rimossi. Sempre. Quando la feature è stabile, il flag va via. Quando il test è finito, il flag va via. Quando nessuno ricorda perché il flag esiste, il flag va via. E invece. Invece i feature flag si accumulano. E si moltiplicano. E si dimenticano. E un giorno, qualcuno li tocca. E tutto si rompe. E tu ti chiedi: "Com'è possibile che un flag del 2024 stesse ancora lì?" E la risposta è semplice: perché nessuno l'ha mai rimosso. E quel flag controllava qualcosa di importante. E quel qualcosa era il throttling delle API. E il throttling era disabilitato. Da due anni. E nessuno lo sapeva. E quando qualcuno ha abilitato il flag "per sbaglio", il throttling è tornato. E le API hanno smesso di funzionare. E i clienti hanno chiamato. E UL ha chiamato. E tu hai risposto. E hai detto: "Il feature flag era lì da due anni." E UL ha detto: "E PERCHÉ ERA LÌ DA DUE ANNI?!" E tu hai detto: "Perché nessuno l'ha rimosso." E UL ha detto: "E PERCHÉ NESSUNO L'HA RIMOSSO?!" E la verità è che tutti dimenticano i feature flag. E i feature flag non dimenticano. Loro restano. E aspettano. E quando li tocchi, ti mordono. Amen.
+C'è una verità nei feature flag che tutti conoscono ma nessuno rispetta: un feature flag deve avere una data di scadenza. Sempre. Quando crei un feature flag, devi sapere quando lo rimuoverai. E se non lo sai, il feature flag resta. Per sempre. E dopo un anno, nessuno sa cosa fa. E dopo due anni, nessuno sa perché esiste. E dopo tre anni, qualcuno lo tocca. E il sistema crolla. E tu ti chiedi: "Com'è possibile che un feature flag del 2023 abbia ucciso la produzione?" E la risposta è semplice: perché nessuno lo ricordava. E nessuno lo ricordava perché non era documentato. E non era documentato perché JN l'aveva creato di venerdì sera. E se ne era dimenticato. E il feature flag è rimasto. Per tre anni. Ad aspettare. Come una mina. E quando qualcuno l'ha calpestata, è esplosa. Amen.
 
 ![](../../img/server.jpg)
 
@@ -14,423 +14,522 @@ C'è una verità nel feature toggling che tutti conoscono ma nessuno rispetta: i
 
 **Lunedì - La Scoperta**
 
-Era lunedì. Le 10:00. JN stava pulendo il codice.
+Era lunedì. Le 10:00. Il caffè era pronto. Il sistema sembrava ok.
 
-**JN**: Ho trovato un feature flag strano!
+Poi è arrivato il ticket.
 
-**ME**: Strano come?
+**SUPPORTO**: I clienti vedono prezzi sbagliati. Alcuni vedono prezzi vecchi, altri prezzi nuovi.
 
-**JN**: Si chiama `ENABLE_API_THROTTLING`. Ed è settato a `false`.
+**ME**: Prezzi sbagliati?!
 
-**ME**: Throttling disabilitato?
+**TL**: Prezzi sbagliati?!
 
-**JN**: Sì. E il commento dice "temporaneo per il Black Friday 2024".
+**ME**: Sì. Alcuni clienti vedono 49.99, altri 39.99.
 
-**ME**: 2024?!
+**TL**: E QUAL È QUELLO GIUSTO?!
 
-**JN**: Sì. Due anni fa.
-
-**ME**: E È ANCORA LÌ?!
-
-**JN**: Sì. E non so se posso rimuoverlo.
-
-**ME**: E QUINDI?!
-
-**JN**: Quindi... lo abilito per vedere cosa succede?
-
-**ME**: NO! NON TOCCARE NULLA!
-
-**JN**: Troppo tardi. Ho già fatto il deploy.
-
-**ME**: COSA?!
-
-**JN**: Ho pensato che fosse un bug...
-
-**ME**: JN, I FEATURE FLAG NON SI TOCCANO SENZA SAPERE COSA FANNO!
-
-**JN**: Ma era disabilitato da due anni!
-
-**ME**: E FORSE C'ERA UN MOTIVO!
+**ME**: Non lo so. Controllo.
 
 **TERMINALE**:
 ```
-# Controlla stato API
-kubectl logs -l app=api-gateway --since=5m | grep -i throttling | tail -20
-2027-01-16 10:05:01 INFO: API Throttling enabled - limit: 100 req/min
-2027-01-16 10:05:01 INFO: Client api-client-123 blocked: rate limit exceeded
-2027-01-16 10:05:02 INFO: Client api-client-456 blocked: rate limit exceeded
-2027-01-16 10:05:03 INFO: Client api-client-789 blocked: rate limit exceeded
-...
+# Controlla prezzi nel database
+kubectl exec -it postgres-0 -- psql -U products -c "SELECT id, name, price FROM products WHERE id = 'SKU-12345'"
+id        | name           | price
+----------+----------------+-------
+SKU-12345 | Premium Widget | 39.99
 
-# Conta richieste bloccate
-kubectl logs -l app=api-gateway --since=5m | grep -i "blocked" | wc -l
-847
+# Controlla cache
+kubectl exec -it redis-0 -- redis-cli GET "product:SKU-12345"
+"{\"id\":\"SKU-12345\",\"name\":\"Premium Widget\",\"price\":39.99}"
 
-# Controlla errori
-kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum(rate(http_requests_total{status="429"}[5m]))'
-{status: "success", data: {result: [{value: ["234"]}]}}  # 234 errori 429 al secondo
+# Controlla API response
+curl -s https://api.company.com/products/SKU-12345 | jq '.price'
+39.99
+
+# Ma alcuni clienti vedono 49.99?!
+curl -s -H "X-User-ID: user-12345" https://api.company.com/products/SKU-12345 | jq '.price'
+49.99
+
+# Con un altro utente
+curl -s -H "X-User-ID: user-67890" https://api.company.com/products/SKU-12345 | jq '.price'
+39.99
 ```
 
-**ME**: 847 client bloccati. 234 errori 429 al secondo.
+**ME**: Il prezzo cambia in base all'utente.
 
-**TL**: ERRORI 429?!
+**TL**: IN BASE ALL'UTENTE?!
 
-**ME**: Sì. Rate limiting attivo. E i client sono bloccati.
+**ME**: Sì. Alcuni utenti vedono 49.99, altri 39.99.
 
 **TL**: E PERCHÉ?!
 
-**ME**: JN ha abilitato un feature flag che era disabilitato da due anni.
+**ME**: Non lo so. Controllo il codice.
 
-**TL**: DUE ANNI?!
+**TERMINALE**:
+```
+# Cerca logica prezzi
+grep -r "price" src/services/product/ | grep -i "flag\|feature\|toggle"
+src/services/product/pricing.js:  if (featureFlags.isEnabled('legacy-pricing-v2', userId)) {
+src/services/product/pricing.js:    return legacyPrice;
+src/services/product/pricing.js:  }
+src/services/product/pricing.js:  return currentPrice;
 
-**ME**: Sì. Era per il Black Friday 2024. E nessuno l'ha mai rimosso.
+# Controlla feature flag
+curl -s http://feature-flags:8080/flags/legacy-pricing-v2 | jq '.'
+{
+  "name": "legacy-pricing-v2",
+  "enabled": true,
+  "created_at": "2023-04-15T18:30:00Z",
+  "created_by": "jn",
+  "description": null,
+  "expires_at": null,
+  "targeting": {
+    "user_ids": ["user-12345", "user-23456", "user-34567"]
+  }
+}
+```
+
+**ME**: C'è un feature flag del 2023. Senza descrizione. Senza scadenza.
+
+**TL**: DEL 2023?!
+
+**ME**: Sì. Creato da JN. Tre anni fa.
 
 **TL**: E COSA FA?!
 
-**ME**: Abilita il throttling. A 100 richieste al minuto.
+**ME**: Non lo so. Non c'è descrizione.
 
-**TL**: E I NOSTRI CLIENTI?!
+**TL**: E PERCHÉ È ANCORA ATTIVO?!
 
-**ME**: Fanno più di 100 richieste al minuto. E sono bloccati.
+**ME**: Non ha scadenza. E nessuno l'ha mai disattivato.
 
-**TL**: E QUINDI?!
+**TL**: E JN LO SA?!
 
-**ME**: E quindi... disabilitiamo il flag. O alziamo il limite.
-
-**TL**: E QUANTO CI VUOLE?!
-
-**ME**: 30 secondi. Ma dobbiamo capire perché era disabilitato.
+**ME**: JN... lo chiamo.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Throttling: abilitato
-- Client bloccati: 847
-- Errori 429: 234/s
-- JN: responsabile
+- Feature flag: legacy-pricing-v2
+- Creato: 2023-04-15
+- Autore: JN
+- Descrizione: nulla
+- Scadenza: mai
+- Utenti affetti: 3
 
-E tutto era chiaro. Il feature flag era lì da due anni. E JN l'aveva toccato. E tutto si era rotto. Amen.
+E tutto era chiaro. Un feature flag orfano. Senza documentazione. Senza scadenza. Che cambiava i prezzi. Per tre utenti. Da tre anni. Amen.
 
 ---
 
-**Lunedì - 10:15**
+**Lunedì - 10:30**
 
-Ho disabilitato il flag. E il throttling è tornato normale.
+Ho chiamato JN. JN ha risposto. Era lunedì. JN era calmo. Per ora.
+
+**ME**: JN, vieni qui.
+
+**JN**: Sì?
+
+**ME**: Hai creato un feature flag chiamato "legacy-pricing-v2" nel 2023?
+
+**JN**: Nel 2023? Non ricordo.
+
+**ME**: Il 15 aprile 2023. Alle 18:30.
+
+**JN**: Ah! Sì! Per la migrazione dei prezzi!
+
+**ME**: Quale migrazione?
+
+**JN**: Quella del 2023. Quando abbiamo cambiato i prezzi.
+
+**ME**: E COME DOVEVA FUNZIONARE?!
+
+**JN**: Il flag serviva per il rollout graduale. Prima per alcuni utenti, poi per tutti.
+
+**ME**: E POI?!
+
+**JN**: Poi... dovevamo rimuoverlo.
+
+**ME**: E L'HAI FATTO?!
+
+**JN**: No. Me ne sono dimenticato.
+
+**ME**: PER TRE ANNI?!
+
+**JN**: Sì. Ma... funzionava!
+
+**ME**: FUNZIONAVA?! I CLIENTI VEDONO PREZZI SBAGLIATI!
+
+**JN**: Sbagliati?
+
+**ME**: Sì. 49.99 invece di 39.99.
+
+**JN**: Ah. Sì. Quello era il prezzo vecchio.
+
+**ME**: E PERCHÉ È ANCORA ATTIVO?!
+
+**JN**: Non lo so. Me ne sono dimenticato.
+
+**ME**: E QUANTI UTENTI SONO AFFETTI?!
+
+**JN**: Non lo so. Controllo.
 
 **TERMINALE**:
 ```
-# Disabilita throttling
-kubectl set env deployment/api-gateway ENABLE_API_THROTTLING=false
+# Controlla targeting
+curl -s http://feature-flags:8080/flags/legacy-pricing-v2/targeting | jq '.user_ids | length'
+3
 
-# Verifica
-kubectl logs -l app=api-gateway --since=2m | grep -i throttling
-2027-01-16 10:17:01 INFO: API Throttling disabled
+# Ma aspetta... controlla la percentuale
+curl -s http://feature-flags:8080/flags/legacy-pricing-v2 | jq '.targeting'
+{
+  "user_ids": ["user-12345", "user-23456", "user-34567"],
+  "percentage": 0
+}
 
-# Controlla errori
-kubectl logs -l app=api-gateway --since=2m | grep -i "blocked" | wc -l
-0
-
-# Controlla metriche
-kubectl exec -it prometheus-0 -- promtool query instant 'http://localhost:9090' 'sum(rate(http_requests_total{status="429"}[5m]))'
-{status: "success", data: {result: [{value: ["0"]}]}}  # Zero errori 429
+# Solo 3 utenti. Ma perché vedono prezzi vecchi?
 ```
 
-**ME**: Throttling disabilitato. Zero errori.
+**ME**: Solo 3 utenti hanno il flag. Ma vedono prezzi vecchi.
 
-**TL**: E I CLIENTI?!
+**JN**: Sì. Quelli erano i tester.
 
-**ME**: Possono chiamare le API di nuovo.
+**ME**: TESTER?! SONO CLIENTI VERI!
 
-**TL**: E PERCHÉ ERA DISABILITATO?!
+**JN**: Cosa?!
 
-**ME**: Controllo la storia.
+**ME**: I tre user ID sono clienti veri. Non tester.
 
-**TERMINALE**:
-```
-# Cerca nel git blame
-git log --all --oneline --grep="ENABLE_API_THROTTLING" | head -20
-a1b2c3d4 Black Friday 2024: disable throttling for traffic spike
-e5f6g7h8 Add API throttling feature flag
+**JN**: Ah. Allora... forse abbiamo un problema.
 
-# Leggi commit
-git show a1b2c3d4
-Author: Bob <bob@company.com>
-Date:   Thu Nov 28 2024 08:00:00
+**ME**: FORSE?!
 
-    Black Friday 2024: disable throttling for traffic spike
-    
-    Temporarily disable API throttling to handle Black Friday traffic.
-    TODO: Re-enable after the event.
+**JN**: Sì. Dovremmo disattivare il flag.
 
-# Cerca commit di re-enable
-git log --all --oneline --grep="re-enable" --grep="throttling" --all-match
-# Nessun risultato
+**ME**: E LO FAI ORA?!
 
-# Cerca ticket
-jira search "throttling" --status done
-# Nessun ticket chiuso
-```
+**JN**: Sì. Subito.
 
-**ME**: Bob l'ha disabilitato per il Black Friday 2024. Con un TODO per riattivarlo.
-
-**TL**: E BOB?!
-
-**ME**: Bob non c'è più. Se n'è andato sei mesi fa.
-
-**TL**: E NESSUNO L'HA RIATTIVATO?!
-
-**ME**: No. E nessuno l'ha rimosso.
-
-**TL**: E PER DUE ANNI?!
-
-**ME**: Per due anni. E le API non avevano throttling.
-
-**TL**: E NESSUNO L'HA NOTATO?!
-
-**ME**: No. Perché funzionava tutto. Anzi, funzionava meglio. Senza throttling.
-
-**TL**: E QUINDI?!
-
-**ME**: E quindi... il throttling non serviva. O il limite era troppo basso.
-
-**TL**: E ORA?!
-
-**ME**: Ora lo rimuoviamo. E documentiamo perché.
-
-Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Flag: disabilitato
-- Autore: Bob (ex dipendente)
-- Data: Novembre 2024
-- TODO: ignorato
-- Risultato: 2 anni senza throttling
-
-E la lezione era chiara. I feature flag vanno rimossi. E i TODO vanno rispettati. E Bob se n'è andato lasciando debito tecnico. Amen.
+JN ha disattivato il flag. E i tre clienti hanno visto i prezzi giusti. Ma la domanda rimaneva: quanti altri feature flag orfani c'erano? E cosa facevano? E chi li aveva creati? E perché nessuno li ricordava? Amen.
 
 ---
 
 **Lunedì - 11:00**
 
-Ho chiamato JN. JN ha risposto. Era lunedì. JN era preoccupato.
-
-**ME**: JN, vieni qui.
-
-**JN**: Sì? È per il feature flag?
-
-**ME**: Sì. E no.
-
-**JN**: Cosa significa?
-
-**ME**: Significa che hai toccato un flag senza sapere cosa faceva.
-
-**JN**: Ma era disabilitato da due anni!
-
-**ME**: E PER DUE ANNI LE API NON HANNO AVUTO THROTTLING!
-
-**JN**: E QUINDI?!
-
-**ME**: E quindi... funzionava. Ma non era sicuro.
-
-**JN**: Ma non è successo niente per due anni!
-
-**ME**: E SE QUALCUNO AVESSE FATTO UN DDOS?!
-
-**JN**: Non ci ho pensato...
-
-**ME**: E ORA HAI ABBASSATO IL FLAG. E 847 CLIENT SONO STATI BLOCCATI.
-
-**JN**: Scusa...
-
-**ME**: E LA PROSSIMA VOLTA?!
-
-**JN**: La prossima volta chiedo.
-
-**ME**: ESATTO. Chiedi. Prima di toccare qualsiasi feature flag.
-
-**JN**: Ok.
-
-**ME**: E ora andiamo a vedere quanti feature flag ci sono.
-
-**JN**: Quanti?
-
-**ME**: Andiamo a vedere.
-
-JN mi ha guardato. Io guardavo JN. JN guardava il terminale. Il terminale mostrava:
-- Flag toccato: ENABLE_API_THROTTLING
-- Client bloccati: 847
-- Tempo di esposizione: 2 anni
-- JN: da educare
-
-E la lezione era chiara. I feature flag sono pericolosi. E JN va educato. E il debito tecnico va pagato. Amen.
-
----
-
-**Lunedì - 14:00**
-
-Ho auditato tutti i feature flag. Per trovare le bombe a orologeria.
+Ho auditato tutti i feature flag. Per trovare le mine nascoste.
 
 **TERMINALE**:
 ```
-# Cerca tutti i feature flag
-grep -r "FEATURE_" --include="*.js" --include="*.ts" --include="*.py" . | grep -v node_modules | wc -l
-234
-
-# Cerca flag con TODO
-grep -r "TODO" --include="*.js" --include="*.ts" --include="*.py" . | grep -i "flag\|feature\|enable\|disable" | wc -l
-47
-
-# Cerca flag temporanei
-grep -r "temporary\|temp\|temporarily" --include="*.js" --include="*.ts" --include="*.py" . | grep -i "flag\|feature" | wc -l
-23
-
-# Lista flag attivi
-cat config/feature-flags.json | jq '.flags[] | select(.enabled == true) | .name'
-"ENABLE_NEW_CHECKOUT"
-"ENABLE_CACHE_REDIS"
-"ENABLE_API_THROTTLING"
-"DISABLE_LEGACY_AUTH"
-"ENABLE_NEW_DASHBOARD"
-"SKIP_VALIDATION"
-"ENABLE_DEBUG_LOGGING"
-"DISABLE_RATE_LIMIT"
-...
-
-# Controlla età dei flag
-for flag in $(cat config/feature-flags.json | jq -r '.flags[] | .name'); do
-  echo "=== $flag ==="
-  git log --all --oneline --grep="$flag" | head -1
-done
+# Lista tutti i feature flag
+curl -s http://feature-flags:8080/flags | jq '.[] | {name, created_at, created_by, description, expires_at}'
 
 # Risultati
-=== ENABLE_NEW_CHECKOUT ===
-a1b2c3d4 Add new checkout flow (2024-03-15)
+{
+  "name": "legacy-pricing-v2",
+  "created_at": "2023-04-15T18:30:00Z",
+  "created_by": "jn",
+  "description": null,
+  "expires_at": null
+}
+{
+  "name": "new-checkout-flow",
+  "created_at": "2024-02-20T14:00:00Z",
+  "created_by": "bob",
+  "description": "New checkout flow - REMOVE AFTER MIGRATION",
+  "expires_at": null
+}
+{
+  "name": "dark-mode-beta",
+  "created_at": "2024-06-10T09:00:00Z",
+  "created_by": "jn",
+  "description": "Dark mode for beta users",
+  "expires_at": null
+}
+{
+  "name": "api-rate-limit-v2",
+  "created_at": "2023-11-05T16:45:00Z",
+  "created_by": "me",
+  "description": null,
+  "expires_at": null
+}
+{
+  "name": "payment-gateway-migration",
+  "created_at": "2022-08-01T10:00:00Z",
+  "created_by": "bob",
+  "description": "Payment gateway migration - DO NOT DISABLE",
+  "expires_at": null
+}
+{
+  "name": "experimental-cache",
+  "created_at": "2023-01-15T11:30:00Z",
+  "created_by": "jn",
+  "description": "Testing new cache layer",
+  "expires_at": null
+}
+{
+  "name": "search-algorithm-v3",
+  "created_at": "2024-09-01T08:00:00Z",
+  "created_by": "tl",
+  "description": "New search algorithm",
+  "expires_at": null
+}
+{
+  "name": "temp-discount-override",
+  "created_at": "2023-12-20T23:59:00Z",
+  "created_by": "jn",
+  "description": "Temporary discount for holiday sale",
+  "expires_at": null
+}
 
-=== ENABLE_CACHE_REDIS ===
-e5f6g7h8 Migrate to Redis cache (2024-06-20)
+# Conta flag senza scadenza
+curl -s http://feature-flags:8080/flags | jq '[.[] | select(.expires_at == null)] | length'
+8
 
-=== ENABLE_API_THROTTLING ===
-i9j0k1l2 Add API throttling feature flag (2024-11-01)
+# Conta flag senza descrizione
+curl -s http://feature-flags:8080/flags | jq '[.[] | select(.description == null)] | length'
+3
 
-=== DISABLE_LEGACY_AUTH ===
-m3n4o5p6 Disable legacy auth temporarily (2024-09-10)
-
-=== SKIP_VALIDATION ===
-q7r8s9t0 Skip validation for migration (2024-12-01)
-
-=== ENABLE_DEBUG_LOGGING ===
-u1v2w3x4 Enable debug logging for incident (2025-02-14)
-
-=== DISABLE_RATE_LIMIT ===
-y5z6a7b8 Disable rate limit for partner (2025-04-20)
+# Conta flag più vecchi di 1 anno
+curl -s http://feature-flags:8080/flags | jq '[.[] | select(.created_at < "2026-01-16")] | length'
+6
 ```
 
-**ME**: 234 feature flag. 47 con TODO. 23 temporanei. E 7 attivi da più di un anno.
+**ME**: 8 feature flag. Tutti senza scadenza. 6 più vecchi di un anno.
 
-**TL**: 234 FLAG?!
+**TL**: 8 FEATURE FLAG?!
 
-**ME**: Sì. E molti sono vecchi. E nessuno sa cosa fanno.
+**ME**: Sì. E alcuni sono pericolosi.
 
-**TL**: E QUALI SONO PERICOLOSI?!
+**TL**: QUALI?!
 
-**ME**: Quelli che disabilitano cose importanti. Come `SKIP_VALIDATION`. E `DISABLE_RATE_LIMIT`. E `DISABLE_LEGACY_AUTH`.
+**ME**: "temp-discount-override". Creato per il holiday sale del 2023. Ancora attivo.
 
-**TL**: E SONO ATTIVI?!
+**TL**: ANCORA ATTIVO?!
 
-**ME**: Sì. Da mesi. O anni.
+**ME**: Sì. E dà sconti del 50%.
 
-**TL**: E NESSUNO LI HA CONTROLLATI?!
+**TL**: 50%?!
 
-**ME**: No. Perché funzionava tutto.
+**ME**: Sì. A tutti gli utenti.
+
+**TL**: A TUTTI?!
+
+**ME**: Sì. Perché qualcuno ha cambiato il targeting da "beta" a "all".
+
+**TL**: E QUANTO CI COSTA?!
+
+**ME**: Controllo.
+
+**TERMINALE**:
+```
+# Controlla sconti applicati
+kubectl exec -it postgres-0 -- psql -U orders -c "SELECT SUM(discount) FROM orders WHERE created_at > '2023-12-20' AND discount_code = 'HOLIDAY-2023'"
+sum
+--------
+€234,567.89
+
+# Controlla ordini con sconto
+kubectl exec -it postgres-0 -- psql -U orders -c "SELECT COUNT(*) FROM orders WHERE created_at > '2023-12-20' AND discount_code = 'HOLIDAY-2023'"
+count
+-------
+45678
+
+# Controlla quando è stato cambiato il targeting
+curl -s http://feature-flags:8080/flags/temp-discount-override/history | jq '.[] | select(.action == "update") | {timestamp, changes}'
+{
+  "timestamp": "2024-01-15T10:00:00Z",
+  "changes": {"targeting": {"from": "beta", "to": "all"}}
+}
+```
+
+**ME**: Il flag è stato cambiato da "beta" a "all" nel gennaio 2024. E da allora, 45.678 ordini hanno avuto lo sconto del 50%.
+
+**TL**: 45.678 ORDINI?!
+
+**ME**: Sì. Per un totale di 234.567 euro di sconti.
+
+**TL**: 234.000 EURO DI SCONTI?!
+
+**ME**: Sì. Non previsti.
+
+**TL**: E PERCHÉ NESSUNO L'HA NOTATO?!
+
+**ME**: Perché lo sconto era nel feature flag. Non nel database. E il feature flag non era monitorato.
 
 **TL**: E ORA?!
 
-**ME**: Ora li rimuoviamo. O li documentiamo. O li disabilitiamo.
-
-**TL**: E QUANTO CI VUOLE?!
-
-**ME**: Settimane. Perché dobbiamo capire cosa fanno. E se servono ancora.
+**ME**: Ora... disabilito il flag. E chiamo UL.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Feature flag: 234
-- Con TODO: 47
-- Temporanei: 23
-- Attivi da >1 anno: 7
-- Pericolosi: 3
+- Feature flag orfani: 8
+- Flag pericolosi: 2
+- Sconti non previsti: €234,567.89
+- Ordini affetti: 45,678
+- JN: responsabile
 
-E la lezione era chiara. I feature flag si accumulano. E diventano debito tecnico. E il debito tecnico va pagato. Amen.
+E tutto era chiaro. I feature flag orfani costano. E costano caro. E nessuno li controlla. Amen.
 
 ---
 
-**Martedì - La Pulizia**
+**Lunedì - 11:30**
 
-Martedì. Ho iniziato a pulire i feature flag. Dai più vecchi ai più recenti.
+Ho disabilitato i flag pericolosi. E chiamato UL.
 
 **TERMINALE**:
 ```
-# Analizza DISABLE_LEGACY_AUTH
-git log --all --oneline --grep="DISABLE_LEGACY_AUTH" | head -5
-m3n4o5p6 Disable legacy auth temporarily (2024-09-10)
-n7o8p9q0 Re-enable legacy auth (nessun commit trovato)
+# Disabilita flag pericolosi
+curl -X DELETE http://feature-flags:8080/flags/temp-discount-override
+curl -X DELETE http://feature-flags:8080/flags/legacy-pricing-v2
 
-# Controlla se legacy auth esiste ancora
-grep -r "legacy.*auth" --include="*.js" src/ | wc -l
-0
-
-# Il codice legacy auth non esiste più. Il flag può essere rimosso.
-kubectl set env deployment/api-gateway DISABLE_LEGACY_AUTH= # rimuovi
-
-# Analizza SKIP_VALIDATION
-git log --all --oneline --grep="SKIP_VALIDATION" | head -5
-q7r8s9t0 Skip validation for migration (2024-12-01)
-
-# Controlla se la migration è finita
-kubectl exec -it postgres-0 -- psql -U admin -c "SELECT COUNT(*) FROM migration_log WHERE status = 'pending'"
-0
-
-# La migration è finita. Il flag può essere rimosso.
-kubectl set env deployment/api-gateway SKIP_VALIDATION= # rimuovi
-
-# Analizza DISABLE_RATE_LIMIT
-git log --all --oneline --grep="DISABLE_RATE_LIMIT" | head -5
-y5z6a7b8 Disable rate limit for partner (2025-04-20)
-
-# Controlla se il partner esiste ancora
-kubectl exec -it postgres-0 -- psql -U admin -c "SELECT COUNT(*) FROM partners WHERE name = 'ACME Corp' AND status = 'active'"
-1
-
-# Il partner esiste. Ma perché disabilitiamo il rate limit?
-# Controllo ticket
-jira search "ACME Corp rate limit" --status done
-# Ticket: "ACME Corp needs higher rate limit for integration"
-# Soluzione: Aumentare il limite, non disabilitarlo
-
-# Fix: alzare il limite per il partner invece di disabilitare
-kubectl set env deployment/api-gateway DISABLE_RATE_LIMIT=
-kubectl set env deployment/api-gateway PARTNER_ACME_RATE_LIMIT=10000
+# Verifica
+curl -s http://feature-flags:8080/flags | jq '.[] | select(.name | contains("temp") or contains("legacy"))'
+[]
 ```
 
-**ME**: Ho rimosso 3 flag. E fixato 1.
+**ME**: Flag disabilitati. I prezzi sono corretti. Gli sconti sono fermati.
 
-**TL**: E GLI ALTRI?!
+**TL**: E I 234.000 EURO?!
 
-**ME**: Li sto analizzando. Ma ci vuole tempo.
+**ME**: Quelli... persi.
 
-**TL**: E QUANTI RESTANO?!
+**TL**: E UL?!
 
-**ME**: 230. Ma molti sono innocui.
+**ME**: UL... lo chiamo ora.
 
-**TL**: E I PERICOLOSI?!
+Ho chiamato UL. UL ha risposto. Era lunedì. UL era di buon umore. Per ora.
 
-**ME**: Quelli li rimuovo subito. Gli altri... piano piano.
+**UL**: Buongiorno! Come va?
 
-**TL**: E JN?!
+**ME**: Abbiamo un problema con i feature flag.
 
-**ME**: JN mi aiuta. E impara.
+**UL**: Che problema?
+
+**ME**: JN ha creato dei feature flag temporanei. E se ne è dimenticato.
+
+**UL**: E?!
+
+**ME**: E sono rimasti attivi per anni. E hanno dato sconti del 50% a tutti.
+
+**UL**: SCONTI DEL 50%?!
+
+**ME**: Sì. Dal gennaio 2024.
+
+**UL**: E QUANTO?!
+
+**ME**: 234.000 euro di sconti. Non previsti.
+
+**UL**: 234.000 EURO?!
+
+**ME**: Sì. E c'era anche un flag che cambiava i prezzi.
+
+**UL**: E QUANTO È COSTATO?!
+
+**ME**: Quello era solo 3 utenti. Ma il problema è che non sapevamo che esistesse.
+
+**UL**: E QUANTI FEATURE FLAG CI SONO?!
+
+**ME**: 8. Tutti senza scadenza. 6 più vecchi di un anno.
+
+**UL**: E CHI LI HA CREATI?!
+
+**ME**: JN. Bob. E... io.
+
+**UL**: TU?!
+
+**ME**: Sì. Tre anni fa. Per il rate limiting.
+
+**UL**: E È ANCORA ATTIVO?!
+
+**ME**: Sì. Ma quello è innocuo.
+
+**UL**: E GLI ALTRI?!
+
+**ME**: Li sto auditando. E documentando. E aggiungendo scadenze.
+
+**UL**: E JN?!
+
+**ME**: JN... lo educo.
+
+**UL**: E L'HAI GIÀ EDUCATO?!
+
+**ME**: Sì. E ho disabilitato i flag pericolosi.
+
+**UL**: Bene. Documenta tutto. E metti i controlli.
+
+E io ho documentato. E UL ha riattaccato. E la lezione era chiara. I feature flag vanno gestiti. E le scadenze sono obbligatorie. E JN va educato. Amen.
+
+---
+
+**Martedì - L'Audit Completo**
+
+Martedì. Ho auditato tutti i flag. E documentato tutto.
+
+**TERMINALE**:
+```
+# Audit completo
+cat > docs/feature-flags-audit.md << 'EOF'
+## Feature Flags Audit - Gennaio 2027
+
+### Flag Attivi
+
+| Nome | Creato | Autore | Descrizione | Scadenza | Stato |
+|------|--------|--------|-------------|----------|-------|
+| new-checkout-flow | 2024-02-20 | bob | New checkout flow | ❌ | ⚠️ Verificare |
+| dark-mode-beta | 2024-06-10 | jn | Dark mode for beta | ❌ | ⚠️ Verificare |
+| api-rate-limit-v2 | 2023-11-05 | me | Rate limiting | ❌ | ✅ Attivo |
+| payment-gateway-migration | 2022-08-01 | bob | Payment migration | ❌ | ⚠️ CRITICO |
+| experimental-cache | 2023-01-15 | jn | Cache layer | ❌ | ⚠️ Verificare |
+| search-algorithm-v3 | 2024-09-01 | tl | Search algorithm | ❌ | ⚠️ Verificare |
+
+### Flag Disabilitati
+
+| Nome | Creato | Disabilitato | Motivo |
+|------|--------|--------------|--------|
+| legacy-pricing-v2 | 2023-04-15 | 2027-01-16 | Prezzi sbagliati |
+| temp-discount-override | 2023-12-20 | 2027-01-16 | Sconti non previsti |
+
+### Raccomandazioni
+
+1. Aggiungere scadenza a tutti i flag
+2. Documentare tutti i flag
+3. Monitorare l'uso dei flag
+4. Alert per flag senza scadenza
+5. Review trimestrale dei flag
+EOF
+
+# Aggiungi scadenze
+curl -X PATCH http://feature-flags:8080/flags/new-checkout-flow -d '{"expires_at": "2027-03-01"}'
+curl -X PATCH http://feature-flags:8080/flags/dark-mode-beta -d '{"expires_at": "2027-02-01"}'
+curl -X PATCH http://feature-flags:8080/flags/api-rate-limit-v2 -d '{"expires_at": "2027-12-01"}'
+curl -X PATCH http://feature-flags:8080/flags/experimental-cache -d '{"expires_at": "2027-02-01"}'
+curl -X PATCH http://feature-flags:8080/flags/search-algorithm-v3 -d '{"expires_at": "2027-06-01"}'
+
+# Il payment-gateway-migration è critico - non toccare senza verifica
+```
+
+**ME**: Audit completato. Scadenze aggiunte. Flag documentati.
+
+**TL**: E IL PAYMENT GATEWAY?!
+
+**ME**: Quello è critico. "DO NOT DISABLE". Lo verifico con Bob.
+
+**TL**: E BOB?!
+
+**ME**: Bob... non c'è più. Ma il flag dice di non toccarlo.
+
+**TL**: E QUINDI?!
+
+**ME**: E quindi... lo lascio. Ma lo documento. E lo monitoro.
+
+**TL**: E SE È ORFANO ANCHE QUELLO?!
+
+**ME**: Allora... siamo fottuti. Ma almeno sappiamo di essere fottuti.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Flag rimossi: 3
-- Flag fixati: 1
-- Flag restanti: 230
-- Tempo stimato: settimane
+- Flag auditati: 8
+- Flag disabilitati: 2
+- Flag con scadenza: 6
+- Flag critici: 1
+- JN: da educare
 
-E la lezione era chiara. I feature flag vanno puliti. E la pulizia richiede tempo. E JN impara. Amen.
+E tutto era documentato. Ma la lezione era chiara. I feature flag orfani sono pericolosi. E vanno gestiti. E le scadenze sono obbligatorie. Amen.
 
 ---
 
@@ -450,340 +549,317 @@ Mercoledì. Ho educato JN. Di nuovo. Non con rabbia. Con pazienza.
 
 **JN**: Cosa significa?
 
-**ME**: Significa che i feature flag sono pericolosi. Ma anche utili.
+**ME**: Significa che i feature flag orfani sono stati un disastro. Ma sono anche stati un'opportunità.
 
-**JN**: Utili?
+**JN**: Un'opportunità?
 
-**ME**: Sì. Se usati bene. E rimossi quando non servono più.
+**ME**: Sì. Per imparare.
 
-**JN**: E come si usano bene?
+**JN**: Imparare cosa?
 
-**ME**: Cinque regole. Primo: ogni feature flag ha una data di scadenza.
+**ME**: Cinque cose. Primo: ogni feature flag deve avere una scadenza.
 
-**JN**: Scadenza?
+**JN**: Sempre?
 
-**ME**: Sì. Quando lo crei, decidi quando deve essere rimosso. E lo documenti.
-
-**JN**: E se non so quando?
-
-**ME**: Allimenti metti 30 giorni. E se serve ancora, lo estendi.
+**ME**: Sempre. Quando crei un flag, decidi quando muore. E se non lo sai, metti 30 giorni.
 
 **JN**: Ok.
 
-**ME**: Secondo: ogni feature flag ha un proprietario.
+**ME**: Secondo: ogni feature flag deve avere una descrizione.
 
-**JN**: Proprietario?
+**JN**: Sempre?
 
-**ME**: Sì. Qualcuno che sa perché esiste. E che è responsabile di rimuoverlo.
-
-**JN**: E se il proprietario se ne va?
-
-**ME**: Allora il flag va rimosso. O trasferito a qualcun altro.
+**ME**: Sempre. Cosa fa. Perché esiste. Chi lo usa. Quando va rimosso.
 
 **JN**: Ok.
 
-**ME**: Terzo: i feature flag temporanei vanno rimossi subito.
+**ME**: Terzo: i feature flag temporanei sono temporanei.
 
-**JN**: Subito?
+**JN**: Cioè?
 
-**ME**: Sì. Quando l'evento finisce, il flag va via. Il Black Friday finisce? Il flag va via. La migration finisce? Il flag va via.
+**ME**: Cioè: "temp", "experimental", "beta", "migration" = devono morire. E in fretta.
 
-**JN**: E se me lo dimentico?
+**JN**: E se non muoiono?
 
-**ME**: Allora... c'è la data di scadenza. E un alert.
+**ME**: Allora qualcuno li disabilita. O li auditano. E scoprono che hai dato sconti del 50% per due anni.
+
+**JN**: (imbarazzato) Scusa.
+
+**ME**: Quarto: documenta il rollback.
+
+**JN**: Il rollback?
+
+**ME**: Sì. Cosa succede se disabiliti il flag. E come tornare indietro.
+
+**JN**: E se non c'è rollback?
+
+**ME**: Allora il flag è permanente. E non è un feature flag. È una configurazione.
 
 **JN**: Ok.
 
-**ME**: Quarto: non toccare i feature flag esistenti senza capire cosa fanno.
+**ME**: Quinto: monitora i feature flag.
 
-**JN**: Mai?
+**JN**: Monitora?
 
-**ME**: Mai. Prima chiedi. Poi tocchi.
+**ME**: Sì. Chi li usa. Quanto. E se qualcuno li cambia.
 
-**JN**: E se non c'è nessuno?
+**JN**: E come?
 
-**ME**: Allora... non tocchi. E aspetti.
-
-**JN**: Ok.
-
-**ME**: Quinto: documenta ogni feature flag.
-
-**JN**: Documenta?
-
-**ME**: Sì. Nome. Scopo. Data creazione. Data scadenza. Proprietario. E cosa succede se lo tocchi.
+**ME**: Con alert. E audit. E review trimestrali.
 
 **JN**: E se non ho tempo?
 
-**ME**: Allimenti non crei il flag. E fai un deploy normale.
+**ME**: Allimenti trovi il tempo. Perché la prossima volta, i 234.000 euro di sconti li paghi tu.
 
 JN mi ha guardato. Io guardavo JN. JN guardava il terminale. Il terminale mostrava:
-- Feature flag: 230
-- Regole: 5
+- Feature flag: documentati
+- Scadenze: aggiunte
+- Alert: configurati
 - Educazione: completata
-- JN: più saggio
 
-E tutto era risolto. Ma le cose che sembrano risolte sono le più pericolose. Perché i feature flag si accumulano. E il debito tecnico cresce. E l'unico modo per non far crollare il sistema è avere regole. E processi. E educazione. Amen.
+E tutto era risolto. Ma le cose che sembrano risolte sono le più pericolose. Perché i junior sbagliano. E i senior sbagliano. E tutti sbagliano. E l'unico modo per non far crollare il sistema è avere processi. E scadenze. E documentazione. E educazione. Amen.
 
 ---
 
-**Giovedì - Il Sistema**
+**Giovedì - Il Monitoraggio**
 
-Giovedì. Ho creato un sistema per gestire i feature flag. E non dimenticarli.
+Giovedì. Ho aggiunto monitoraggio per i feature flag orfani.
 
 **TERMINALE**:
 ```
-# Crea registro feature flag
-cat > docs/feature-flags.md << 'EOF'
-# Feature Flag Registry
-
-## Regole
-
-1. Ogni flag ha una data di scadenza
-2. Ogni flag ha un proprietario
-3. I flag temporanei vanno rimossi subito
-4. Non toccare i flag esistenti senza capire
-5. Documenta tutto
-
-## Flag Attivi
-
-| Nome | Scopo | Creato | Scadenza | Proprietario | Stato |
-|------|-------|--------|----------|--------------|-------|
-| ENABLE_NEW_CHECKOUT | Nuovo checkout flow | 2024-03-15 | 2024-06-15 | ME | SCADUTO |
-| ENABLE_CACHE_REDIS | Cache Redis | 2024-06-20 | 2024-09-20 | TL | SCADUTO |
-| ENABLE_DEBUG_LOGGING | Debug per incident | 2025-02-14 | 2025-02-21 | ME | SCADUTO |
-
-## Flag da Rimuovere
-
-- ENABLE_NEW_CHECKOUT: scaduto da 2 anni
-- ENABLE_CACHE_REDIS: scaduto da 1.5 anni
-- ENABLE_DEBUG_LOGGING: scaduto da 1 anno
-EOF
-
-# Crea alert per flag scaduti
+# Configura alert per feature flag
 cat > /etc/prometheus/alerts/feature-flags.yml << 'EOF'
 groups:
   - name: feature-flags
     rules:
-      - alert: FeatureFlagExpired
-        expr: |
-          feature_flag_age_days > feature_flag_max_age_days
+      - alert: FeatureFlagWithoutExpiration
+        expr: feature_flag_expires_at == 0
+        for: 24h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag {{ $labels.name }} has no expiration"
+          description: "Feature flag {{ $labels.name }} created by {{ $labels.created_by }} on {{ $labels.created_at }} has no expiration date."
+
+      - alert: FeatureFlagOlderThan90Days
+        expr: (time() - feature_flag_created_at) > 7776000
         for: 1h
         labels:
           severity: warning
         annotations:
-          summary: "Feature flag {{ $labels.flag }} is expired"
-          description: "Feature flag {{ $labels.flag }} created by {{ $labels.owner }} is {{ $value }} days old. Max age: {{ $labels.max_age }} days."
+          summary: "Feature flag {{ $labels.name }} is older than 90 days"
+          description: "Feature flag {{ $labels.name }} has been active for more than 90 days. Review and remove if no longer needed."
 
-      - alert: FeatureFlagWithoutOwner
-        expr: |
-          feature_flag_exists == 1 and on(flag) feature_flag_owner == ""
-        for: 1h
-        labels:
-          severity: warning
-        annotations:
-          summary: "Feature flag {{ $labels.flag }} has no owner"
-          description: "Feature flag {{ $labels.flag }} has no owner assigned. Please update the registry."
-
-      - alert: FeatureFlagTemporaryTooOld
-        expr: |
-          feature_flag_temporary == 1 and feature_flag_age_days > 7
+      - alert: FeatureFlagOlderThan1Year
+        expr: (time() - feature_flag_created_at) > 31536000
         for: 1h
         labels:
           severity: critical
         annotations:
-          summary: "Temporary feature flag {{ $labels.flag }} is too old"
-          description: "Temporary feature flag {{ $labels.flag }} is {{ $value }} days old. Temporary flags should be removed within 7 days."
+          summary: "Feature flag {{ $labels.name }} is older than 1 year"
+          description: "Feature flag {{ $labels.name }} has been active for more than 1 year. This is likely orphaned and should be reviewed immediately."
+
+      - alert: FeatureFlagWithoutDescription
+        expr: feature_flag_description == 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag {{ $labels.name }} has no description"
+          description: "Feature flag {{ $labels.name }} has no description. Add documentation."
+
+      - alert: FeatureFlagExpiringSoon
+        expr: (feature_flag_expires_at - time()) < 86400 AND feature_flag_expires_at > 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag {{ $labels.name }} expires in less than 24 hours"
+          description: "Feature flag {{ $labels.name }} expires at {{ $labels.expires_at }}. Review and extend if needed."
 EOF
 
-# Crea script di cleanup
-cat > scripts/feature-flag-cleanup.sh << 'EOF'
-#!/bin/bash
+# Aggiungi metriche
+cat > src/lib/feature-flag-metrics.js << 'EOF'
+const prometheus = require('prom-client');
 
-# Controlla flag scaduti
-expired_flags=$(cat config/feature-flags.json | jq -r '.flags[] | select(.expires != null and .expires < "'$(date -I)'") | .name')
+const featureFlagEnabled = new prometheus.Gauge({
+  name: 'feature_flag_enabled',
+  help: 'Feature flag enabled status',
+  labelNames: ['name', 'created_by'],
+});
 
-for flag in $expired_flags; do
-  echo "Flag $flag is expired. Removing..."
-  
-  # Notifica proprietario
-  owner=$(cat config/feature-flags.json | jq -r '.flags[] | select(.name == "'$flag'") | .owner')
-  slack-notify "#devops" "Feature flag $flag is expired. Owner: $owner. Please remove or extend."
-  
-  # Se temporaneo, rimuovi automaticamente dopo 7 giorni
-  temporary=$(cat config/feature-flags.json | jq -r '.flags[] | select(.name == "'$flag'") | .temporary')
-  if [ "$temporary" == "true" ]; then
-    echo "Removing temporary flag $flag..."
-    kubectl set env deployment/api-gateway $flag=
-    # Aggiorna registry
-    cat config/feature-flags.json | jq 'del(.flags[] | select(.name == "'$flag'"))' > config/feature-flags.json.tmp
-    mv config/feature-flags.json.tmp config/feature-flags.json
-  fi
-done
+const featureFlagCreatedAt = new prometheus.Gauge({
+  name: 'feature_flag_created_at',
+  help: 'Feature flag creation timestamp',
+  labelNames: ['name', 'created_by'],
+});
+
+const featureFlagExpiresAt = new prometheus.Gauge({
+  name: 'feature_flag_expires_at',
+  help: 'Feature flag expiration timestamp (0 = no expiration)',
+  labelNames: ['name', 'created_by'],
+});
+
+const featureFlagDescription = new prometheus.Gauge({
+  name: 'feature_flag_description',
+  help: 'Feature flag has description (0 = no, 1 = yes)',
+  labelNames: ['name', 'created_by'],
+});
+
+module.exports = { featureFlagEnabled, featureFlagCreatedAt, featureFlagExpiresAt, featureFlagDescription };
 EOF
 
-chmod +x scripts/feature-flag-cleanup.sh
-
-# Aggiungi al cron
-echo "0 9 * * * /scripts/feature-flag-cleanup.sh" | crontab -
+# Configura review trimestrale
+cat > .github/workflows/feature-flag-review.yml << 'EOF'
+name: Feature Flag Review
+on:
+  schedule:
+    - cron: '0 9 1 */3 *'  # Every 3 months
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get feature flags
+        run: |
+          curl -s http://feature-flags:8080/flags > flags.json
+          echo "## Feature Flags Review" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          jq -r '.[] | "- **\(.name)**: created \(.created_at) by \(.created_by), expires: \(.expires_at // "never")"' flags.json >> $GITHUB_STEP_SUMMARY
+      - name: Create issue for orphaned flags
+        run: |
+          orphaned=$(jq '[.[] | select(.expires_at == null and .created_at < "2026-01-01")] | length' flags.json)
+          if [ "$orphaned" -gt 0 ]; then
+            echo "::warning::$orphaned feature flags have no expiration and are older than 1 year"
+          fi
+EOF
 ```
 
-**TL**: Hai creato il sistema?
+**TL**: Hai aggiunto il monitoraggio?
 
-**ME**: Sì. Registro. Alert. E script di cleanup.
+**ME**: Sì. Alert per flag senza scadenza. Alert per flag vecchi. Alert per flag senza descrizione. E review trimestrale.
 
 **TL**: E QUINDI?!
 
-**ME**: E quindi... non dimentichiamo più i feature flag.
+**ME**: E quindi... vediamo i flag orfani prima che uccidano il sistema.
 
-**TL**: E SE QUALCUNO IGNORA GLI ALERT?!
+**TL**: E SE NON LO VEDIAMO?!
 
-**ME**: Allora... lo script rimuove i flag temporanei automaticamente.
+**ME**: Allora... l'alert ci avvisa. E interveniamo.
 
-**TL**: E I FLAG NON TEMPORANEI?!
+**TL**: E SE NON INTERVENIAMO?!
 
-**ME**: Quelli... li notifica. E se nessuno risponde, li rimuove dopo 30 giorni.
-
-**TL**: E SE SERVONO ANCORA?!
-
-**ME**: Allora... qualcuno risponde. E li estende.
-
-**TL**: E SE NESSUNO RISPONDE?!
-
-**ME**: Allimenti non servono. E vanno rimossi.
+**ME**: Allora... siamo fottuti. Ma almeno sappiamo di essere fottuti.
 
 Il TL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Registro: creato
 - Alert: configurati
-- Cleanup: automatico
-- Flag scaduti: 3
+- Metriche: attive
+- Review: trimestrale
+- Flag: documentati
 
-E tutto funzionava. Ma avevo imparato una lezione. La lezione che i feature flag vanno gestiti. E che il sistema aiuta. E che l'automazione salva. Amen.
+E tutto funzionava. Ma avevo imparato una lezione. La lezione che i feature flag vanno gestiti. E che le scadenze sono obbligatorie. E che il monitoraggio salva. E che JN va educato. Amen.
 
 ---
 
 **Venerdì - La Documentazione**
 
-Venerdì. Ho documentato. Per i posteri. Per i futuri sviluppatori che avrebbero creato feature flag e dimenticato di rimuoverli.
+Venerdì. Ho documentato. Per i posteri. Per i futuri sviluppatori che avrebbero dimenticato i feature flag.
 
 ```markdown
 ## Incident #FLAG-001: Il Feature Flag Che Nessuno Ricordava
 
 **Data incident**: Lunedì 16 gennaio 2027, 10:00
-**Autore**: JN (che ha toccato il flag)
-**Creatore originale**: Bob (ex dipendente)
-**Servizio**: API Gateway
-**Problema**: Feature flag abilitato dopo 2 anni di inattività
-**Causa**: Flag mai rimosso dopo Black Friday 2024
-**Tempo in produzione**: 2 anni
-**Client bloccati**: 847
-**Errori 429**: 234/s
-**Tempo di risoluzione**: 15 minuti
-**Downtime**: 0 (servizio parzialmente funzionante)
-**Reazione UL**: "Due anni?!"
-**Reazione TL**: "847 client?!"
-**Reazione CTO**: "I feature flag vanno rimossi."
-**Soluzione**: Flag rimosso + audit + sistema di gestione
-**Lezione imparata**: I FEATURE FLAG VANNO RIMOSSI. SEMPRE.
+**Autore**: JN
+**Servizio**: Product Service
+**Problema**: Feature flag orfano cambiava i prezzi
+**Causa**: Feature flag temporaneo mai disabilitato
+**Tempo in produzione**: 3 anni e 9 mesi
+**Clienti affetti**: 3 (prezzi) + 45,678 (sconti)
+**Sconti non previsti**: €234,567.89
+**Reazione UL**: "234.000 euro?!"
+**Reazione TL**: "Feature flag orfani?!"
+**Reazione CTO**: "Scadenze obbligatorie. Monitoraggio. Review trimestrale."
+**Soluzione**: Disabilitazione flag + audit + scadenze + monitoraggio
+**Lezione imparata**: I FEATURE FLAG DEVONO AVERE UNA SCADENZA. SEMPRE.
 
 **Regole per i feature flag**:
-1. Ogni flag ha una DATA DI SCADENZA.
-2. Ogni flag ha un PROPRIETARIO.
-3. I flag TEMPORANEI vanno rimossi SUBITO.
-4. Non TOCCARE i flag esistenti senza capire.
-5. DOCUMENTA ogni flag.
-6. I flag scaduti vanno RIMOSSI automaticamente.
-7. Il debito tecnico va PAGATO. Amen.
+1. OGNI feature flag DEVE avere una scadenza.
+2. OGNI feature flag DEVE avere una descrizione.
+3. I flag temporanei ("temp", "beta", "migration") DEVONO morire in fretta.
+4. Documenta cosa fa il flag. E cosa succede se lo disabiliti.
+5. Monitora i feature flag. Con alert. E review trimestrali.
+6. Se un flag è permanente, non è un feature flag. È una configurazione.
+7. I feature flag orfani costano. E costano caro. Amen.
 
 **Come creare un feature flag correttamente**:
-```yaml
-# config/feature-flags.json
-{
-  "flags": [
-    {
-      "name": "ENABLE_NEW_FEATURE",
-      "description": "Enable new feature for beta testing",
-      "created": "2027-01-16",
-      "expires": "2027-02-16",
-      "owner": "team-lead@company.com",
-      "temporary": false,
-      "enabled": true,
-      "impact": "Enables new checkout flow. Rollback: set to false."
-    }
-  ]
-}
-```
-
-**Come rimuovere un feature flag**:
 ```bash
-# 1. Verifica che non serva più
-git log --all --oneline --grep="FLAG_NAME"
-
-# 2. Controlla se il codice esiste ancora
-grep -r "FLAG_NAME" --include="*.js" src/
-
-# 3. Rimuovi dal codice
-# Rimuovi tutti i riferimenti al flag
-
-# 4. Rimuovi dalla configurazione
-kubectl set env deployment/SERVICE FLAG_NAME=
-
-# 5. Aggiorna il registro
-# Rimuovi dal file feature-flags.json
-
-# 6. Commit e push
-git add .
-git commit -m "Remove feature flag FLAG_NAME"
-git push
+# Crea flag con scadenza
+curl -X POST http://feature-flags:8080/flags \
+  -d '{
+    "name": "new-feature-x",
+    "description": "Enable new feature X for beta users. Remove after 2027-02-01.",
+    "created_by": "jn",
+    "expires_at": "2027-02-01T00:00:00Z",
+    "targeting": {
+      "percentage": 10
+    }
+  }'
 ```
 
 **Come auditare i feature flag**:
 ```bash
-# Lista tutti i flag
-grep -r "FEATURE_" --include="*.js" src/ | cut -d: -f2 | sort | uniq
+# Lista flag senza scadenza
+curl -s http://feature-flags:8080/flags | jq '.[] | select(.expires_at == null)'
 
-# Trova flag vecchi
-for flag in $(grep -r "FEATURE_" --include="*.js" src/ | cut -d: -f2 | sort | uniq); do
-  echo "=== $flag ==="
-  git log --all --oneline --grep="$flag" | head -1
-done
+# Lista flag più vecchi di 1 anno
+curl -s http://feature-flags:8080/flags | jq '.[] | select(.created_at < "2026-01-01")'
 
-# Trova flag con TODO
-grep -r "TODO" --include="*.js" src/ | grep -i "flag\|feature"
+# Lista flag senza descrizione
+curl -s http://feature-flags:8080/flags | jq '.[] | select(.description == null)'
+```
+
+**Come configurare alert**:
+```yaml
+groups:
+  - name: feature-flags
+    rules:
+      - alert: FeatureFlagWithoutExpiration
+        expr: feature_flag_expires_at == 0
+        for: 24h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature flag has no expiration"
 ```
 ```
 
-Il TL ha letto la documentazione. Il TL ha sorriso. Il TL ha detto: "Quindi hai imparato che i feature flag vanno rimossi. E che le date di scadenza sono obbligatorie. E che i proprietari vanno assegnati. E che JN va educato. E che 847 client bloccati sono tanti. E che la prossima volta non succede. O quasi. Amen."
+Il TL ha letto la documentazione. Il TL ha sorriso. Il TL ha detto: "Quindi hai imparato che i feature flag devono avere una scadenza. E una descrizione. E un monitoraggio. E che JN va educato. E che 234.000 euro di sconti sono tanti. E che la prossima volta non succede. O quasi. Amen."
 
-**ME**: Sì. E la lezione più importante è questa: i feature flag sono come gli ospiti. Quando arrivano, sono benvenuti. Ma quando la festa finisce, devono andarsene. E se non se ne vanno, occupano spazio. E consumano risorse. E un giorno qualcuno li tocca. E tutto si rompe. E tu ti chiedi: "Com'è possibile che questo flag fosse ancora qui?" E la risposta è semplice: perché nessuno l'ha mandato via. E quel flag era lì dal Black Friday 2024. E Bob se n'è andato. E il flag è rimasto. E JN l'ha toccato. E 847 client sono stati bloccati. E UL ha chiamato. E tu hai risposto. E hai detto: "Il feature flag era lì da due anni." E UL ha detto: "E PERCHÉ ERA LÌ DA DUE ANNI?!" E tu hai detto: "Perché nessuno l'ha rimosso." E UL ha detto: "E PERCHÉ NESSUNO L'HA RIMOSSO?!" E tu hai detto: "Perché non c'era un sistema." E UL ha detto: "E ORA C'È?!" E tu hai detto: "Sì. C'è il registro. E gli alert. E il cleanup automatico." E UL ha detto: "Bene. E la prossima volta?" E tu hai detto: "La prossima volta non succede. Perché c'è il sistema." E la verità è che i sistemi aiutano. Ma non sostituiscono la disciplina. E la disciplina significa rimuovere i feature flag. Quando non servono più. Sempre. Amen.
+**ME**: Sì. E la lezione più importante è questa: i feature flag sono come i debiti tecnici. Se non li paghi, si accumulano. E se si accumulano, esplodono. E quando esplodono, i clienti vedono prezzi sbagliati. E sconti non previsti. E UL chiama. E tu rispondi. E dici: "Il feature flag era del 2023." E UL dice: "E PERCHÉ ERA ANCORA ATTIVO?!" E tu dici: "Perché nessuno l'aveva disabilitato." E UL dice: "E PERCHÉ NESSUNO L'AVEVA DISABILITATO?!" E tu dici: "Perché non aveva scadenza." E UL dice: "E PERCHÉ NON AVEVA SCADENZA?!" E tu dici: "Perché JN se ne era dimenticato." E la verità è che tutti dimenticano. I junior dimenticano. I senior dimenticano. Tutti dimenticano. E l'unico modo per non far crollare il sistema è avere scadenze. E alert. E review. E documentazione. E educazione. Amen.
 
 ---
 
-## Il costo del feature flag dimenticato
+## Il costo del feature flag che nessuno ricordava
 
 | Voce | Valore |
 |------|--------|
-| Servizio | API Gateway |
-| Creatore originale | Bob (ex dipendente) |
-| Data creazione | 28/11/2024 |
-| Scopo | Black Friday 2024 |
-| Data incident | 16/01/2027, 10:00 |
-| Tempo in produzione | 2 anni |
-| Client bloccati | 847 |
-| Errori 429 | 234/s |
-| Tempo di risoluzione | 15 minuti |
-| Downtime | 0 (parziale) |
-| Feature flag totali | 234 |
-| Flag con TODO | 47 |
-| Flag temporanei | 23 |
-| Flag scaduti | 3 |
-| Reazione UL | "Due anni?!" |
-| Reazione TL | "847 client?!" |
-| Reazione CTO | "Vanno rimossi." |
-| Soluzione | Flag rimosso + audit + sistema |
-| Lezione imparata | FLAG = DATA SCADENZA + PROPRIETARIO |
-| **Totale** | **847 client bloccati + 234 flag auditati + 3 flag rimossi + 1 sistema creato** |
+| Servizio | Product Service |
+| Autore | JN |
+| Data creazione | 15/04/2023, 18:30 |
+| Data discovery | 16/01/2027, 10:00 |
+| Tempo in produzione | 3 anni e 9 mesi |
+| Flag orfani trovati | 8 |
+| Flag pericolosi | 2 |
+| Clienti con prezzi sbagliati | 3 |
+| Ordini con sconti non previsti | 45,678 |
+| Sconti non previsti | €234,567.89 |
+| Reazione UL | "234.000 euro?!" |
+| Reazione TL | "Feature flag orfani?!" |
+| Reazione CTO | "Scadenze obbligatorie." |
+| Soluzione | Disabilitazione + audit + scadenze + monitoraggio |
+| Lezione imparata | FEATURE FLAG = SCADENZA OBBLIGATORIA |
+| **Totale** | **€234,567.89 di sconti + 8 flag auditati + 1 junior educato** |
 
-**Morale**: I feature flag sono come gli ospiti. Quando arrivano, sono benvenuti. Ma quando la festa finisce, devono andarsene. E se non se ne vanno, occupano spazio. E consumano risorse. E un giorno qualcuno li tocca. E tutto si rompe. E tu ti chiedi: "Com'è possibile che questo flag fosse ancora qui?" E la risposta è semplice: perché nessuno l'ha mandato via. E quel flag era lì dal Black Friday 2024. E Bob se n'è andato. E il flag è rimasto. E JN l'ha toccato. E 847 client sono stati bloccati. E UL ha chiamato. E tu hai risposto. E hai detto: "Il feature flag era lì da due anni." E UL ha detto: "E PERCHÉ ERA LÌ DA DUE ANNI?!" E tu hai detto: "Perché nessuno l'ha rimosso." E UL ha detto: "E PERCHÉ NESSUNO L'HA RIMOSSO?!" E tu hai detto: "Perché non c'era un sistema." E la verità è che i sistemi aiutano. Ma non sostituiscono la disciplina. E la disciplina significa rimuovere i feature flag. Quando non servono più. Sempre. E se non li rimuovi, si accumulano. E diventano debito tecnico. E il debito tecnico va pagato. Con gli interessi. E gli interessi sono 847 client bloccati. E 15 minuti di panico. E una chiamata con UL. E una lezione imparata. Amen.
+**Morale**: I feature flag devono avere una scadenza. Sempre. Quando crei un flag, decidi quando muore. E se non lo sai, metti 30 giorni. E se dopo 30 giorni è ancora utile, estendi. Ma non lasciarlo senza scadenza. Perché i feature flag senza scadenza diventano orfani. E gli orfani dimenticati diventano mine. E le mine esplodono. E quando esplodono, i clienti vedono prezzi sbagliati. E sconti non previsti. E UL chiama. E tu rispondi. E dici: "Il feature flag era del 2023." E UL dice: "E PERCHÉ ERA ANCORA ATTIVO?!" E tu dici: "Perché non aveva scadenza." E UL dice: "E QUANTO È COSTATO?!" E tu dici: "234.000 euro." E UL dice: "E NE VALEVA LA PENA?!" E tu dici: "No." E la verità è che i feature flag orfani costano. Sempre. E la prossima volta, metti una scadenza. E una descrizione. E un alert. E una review. E tutto funziona. O quasi. Amen.
 
 ---
 
@@ -793,4 +869,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-il-migration-che-ha-cancellato-tutto.md)**
+**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-migrazione-che-ha-cancellato-la-tabella-sbagliata.md)**
