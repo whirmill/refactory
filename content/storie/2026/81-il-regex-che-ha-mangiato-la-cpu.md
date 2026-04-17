@@ -2,7 +2,7 @@
 
 **Data**: 05/09/2026
 
-**[Home](../index.md) | [Precedente](80-la-variabile-dambiente-che-e-finita-su-git.md)]**
+**[Home](../index.md) | [Precedente](80-la-variabile-dambiente-che-e-finita-su-git.md) | [Prossima](82-la-cache-che-non-scadeva-mai.md)]**
 
 ---
 
@@ -729,4 +729,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Home](../index.md) | [Precedente](80-la-variabile-dambiente-che-e-finita-su-git.md)]**
+**[Home](../index.md) | [Precedente](80-la-variabile-dambiente-che-e-finita-su-git.md) | [Prossima](82-la-cache-che-non-scadeva-mai.md)]**
