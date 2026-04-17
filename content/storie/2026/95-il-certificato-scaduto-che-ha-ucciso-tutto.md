@@ -2,7 +2,7 @@
 
 **Data**: 12/12/2026
 
-**[Storie 2026](index.md) | [Precedente](94-il-database-senza-password.md) | [Prossima](96-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](94-il-database-senza-password.md) | [Prossima](96-il-webhook-che-ha-inondato-la-coda.md)**
 
 ---
 
@@ -804,4 +804,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](94-il-database-senza-password.md) | [Prossima](96-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](94-il-database-senza-password.md) | [Prossima](96-il-webhook-che-ha-inondato-la-coda.md)**
