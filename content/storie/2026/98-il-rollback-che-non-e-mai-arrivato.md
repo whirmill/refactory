@@ -2,7 +2,7 @@
 
 **Data**: 02/01/2027
 
-**[Storie 2026](index.md) | [Precedente](97-il-secret-che-era-nel-repo-pubblico.md) | [Prossima](99-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](97-il-secret-che-era-nel-repo-pubblico.md) | [Prossima](99-il-health-check-che-mentiva-sempre.md)**
 
 ---
 
@@ -933,4 +933,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](97-il-secret-che-era-nel-repo-pubblico.md) | [Prossima](99-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](97-il-secret-che-era-nel-repo-pubblico.md) | [Prossima](99-il-health-check-che-mentiva-sempre.md)**
