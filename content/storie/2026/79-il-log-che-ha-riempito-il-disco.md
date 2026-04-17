@@ -2,7 +2,7 @@
 
 **Data**: 22/08/2026
 
-**[Home](../index.md) | [Precedente](78-il-cron-job-che-girava-ogni-minuto.md)]**
+**[Home](../index.md) | [Precedente](78-il-cron-job-che-girava-ogni-minuto.md) | [Prossima](80-la-variabile-dambiente-che-e-finita-su-git.md)]**
 
 ---
 
