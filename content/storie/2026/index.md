@@ -6,6 +6,10 @@
 
 ---
 
+**[← 2025](../2025/index.md) | [2027 →](../2027/index.md)**
+
+---
+
 ## Storie del 2026
 
 (in ordine cronologico inverso)
