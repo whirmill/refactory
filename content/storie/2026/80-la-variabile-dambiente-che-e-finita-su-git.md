@@ -2,7 +2,7 @@
 
 **Data**: 29/08/2026
 
-**[Home](../index.md) | [Precedente](79-il-log-che-ha-riempito-il-disco.md)]**
+**[Home](../index.md) | [Precedente](79-il-log-che-ha-riempito-il-disco.md) | [Prossima](81-il-regex-che-ha-mangiato-la-cpu.md)]**
 
 ---
 
