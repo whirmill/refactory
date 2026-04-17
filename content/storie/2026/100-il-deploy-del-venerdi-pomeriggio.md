@@ -1,504 +1,1172 @@
-# Il Deploy Del Venerdì Pomeriggio
+# Il Deploy del Venerdì Pomeriggio
 
 **Data**: 16/01/2027
 
-**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-documentazione-che-nessuno-leggeva.md)**
+**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-password-che-scade-sempre-di-venerdi.md)**
 
 ---
 
-C'è una regola non scritta nel mondo IT: non si fa mai il deploy di venerdì pomeriggio. È una regola semplice. Una regola chiara. Una regola che tutti conoscono. E che tutti violano. Sempre. Perché il venerdì pomeriggio è quando il PM ti chiama e dice: "Possiamo fare questo deploy? È urgente." E tu dici: "È venerdì pomeriggio." E il PM dice: "Lo so, ma è urgente." E tu dici: "Se qualcosa va storto, non c'è nessuno per fixarlo." E il PM dice: "Non andrà storto. È un deploy semplice." E tu sai che non è vero. Il PM sa che non è vero. Tutti sanno che non è vero. Ma il deploy si fa lo stesso. E qualcosa va storto. Sempre. Amen.
+C'è una regola non scritta nel mondo IT: non si fa mai il deploy di venerdì pomeriggio. Mai. È una regola semplice. È una regola chiara. È una regola che tutti conoscono. E che tutti violano. Sempre. Perché c'è sempre un motivo. C'è sempre un'urgenza. C'è sempre un cliente che vuole la feature per il weekend. E così, venerdì alle 17:30, qualcuno fa il deploy. E venerdì alle 18:00, qualcosa si rompe. E venerdì alle 18:30, tutti sono ancora in ufficio. E sabato mattina alle 03:00, qualcuno sta ancora fixando. E lunedì mattina, UL chiede: "Perché avete fatto il deploy di venerdì?" E tu rispondi: "Perché era urgente." E UL dice: "E ora è urgente fixarlo." E tu dici: "Lo so." E UL dice: "E la prossima volta?" E tu dici: "La prossima volta non facciamo il deploy di venerdì." E UL dice: "Bene." E il venerdì dopo, qualcuno fa il deploy. Sempre. Amen.
 
 ![](../../img/deploy.jpg)
 
 ---
 
-**Venerdì - 16:45**
+**Venerdì - 17:15**
 
-Era venerdì. 16:45. Il weekend era vicino. Il caffè era finito. La motivazione era zero.
+Era venerdì. Le 17:15. Il weekend era vicino. Il caffè era finito. La motivazione era zero.
 
-Poi è arrivato il PM.
+Poi è arrivato il messaggio.
 
-**PM**: Abbiamo un deploy urgente!
+**PM**: Abbiamo bisogno del deploy per stasera.
 
-**ME**: È venerdì. 16:45.
+**ME**: Stasera?!
 
-**PM**: Lo so! Ma il cliente vuole questa feature per lunedì!
+**PM**: Sì. Il cliente vuole la feature per il weekend.
 
-**ME**: E non potevamo farlo giovedì?
+**ME**: Ma è venerdì. Alle 17:15.
 
-**PM**: Il codice non era pronto!
+**PM**: Sì. E quindi?
 
-**ME**: E non possiamo farlo lunedì mattina?
+**ME**: E quindi non si fa il deploy di venerdì.
 
-**PM**: Il cliente la vuole per lunedì mattina!
+**PM**: Ma è urgente.
 
-**ME**: E se qualcosa va storto?
-
-**PM**: Non andrà storto! È un deploy semplice!
-
-**ME**: Semplice come?
-
-**PM**: Solo un piccolo cambiamento al database!
-
-**ME**: ...database?
-
-**PM**: Sì! Dobbiamo aggiungere una colonna!
-
-**ME**: Una colonna?
-
-**PM**: Sì! Una colonna nullable!
-
-**ME**: E la migration?
-
-**PM**: È già pronta! L'ha scritta JN!
-
-**ME**: JN?!
-
-**PM**: Sì! È semplice!
-
-**ME**: Fammi vedere la migration.
-
-**TERMINALE**:
-```
-# Leggi migration
-cat migrations/20270116_add_user_preferences.sql
--- Add user preferences column
-ALTER TABLE users ADD COLUMN preferences JSONB DEFAULT '{}';
-
--- Update existing users
-UPDATE users SET preferences = '{"theme": "light", "notifications": true}';
-
--- Add index
-CREATE INDEX idx_users_preferences ON users USING GIN (preferences);
-```
-
-**ME**: Questa migration fa un UPDATE su tutti gli utenti.
-
-**PM**: Sì! Per dare un default!
-
-**ME**: Quanti utenti abbiamo?
-
-**PM**: Non lo so! Tanti!
-
-**TERMINALE**:
-```
-# Conta utenti
-psql -c "SELECT COUNT(*) FROM users"
- count
---------
-847293
-```
-
-**ME**: 847.293 utenti.
-
-**PM**: E quindi?
-
-**ME**: E quindi l'UPDATE bloccherà la tabella per minuti.
-
-**PM**: Ma è un UPDATE semplice!
-
-**ME**: È un UPDATE su 847.293 righe. Su una tabella che viene usata per il login. Durante l'orario di lavoro.
-
-**PM**: Ma sono le 16:50! Tra poco smettono di lavorare!
-
-**ME**: In Italia sì. Ma in America sono le 10:50 del mattino!
-
-**PM**: Ah.
-
-**ME**: Ah.
-
-**PM**: E quindi?
-
-**ME**: E quindi non facciamo il deploy di venerdì pomeriggio.
+**ME**: È sempre urgente.
 
 **PM**: Ma il cliente...
 
-**ME**: Il cliente capirà. O non capirà. Ma se facciamo il deploy e il sistema si blocca, il cliente non capirà. E UL non capirà. E il CTO non capirà. E io non capirò perché ho fatto il deploy di venerdì pomeriggio.
+**ME**: Il cliente può aspettare lunedì.
 
-Il PM mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Utenti: 847.293
-- Migration: bloccante
-- Ora: 16:52
-- Giorno: venerdì
-- Saggio: no
+**PM**: No. Il cliente vuole la feature per il weekend.
 
-E tutto era chiaro. Il deploy di venerdì pomeriggio è una pessima idea. E il PM lo sapeva. E io lo sapevo. E tutti lo sapevano. Ma il PM voleva farlo lo stesso. Perché il cliente voleva la feature. E il cliente è sempre più importante del buon senso. Amen.
+**ME**: E CHE SE NE FA DEL WEEKEND?!
 
----
+**PM**: Non lo so. Ma la vuole.
 
-**Venerdì - 17:00**
+**ME**: E SE SI ROMPE?!
 
-Il PM è andato da UL. UL ha chiamato me.
+**PM**: Non si rompe.
 
-**UL**: Il PM mi dice che non vuoi fare il deploy.
+**ME**: SI ROMPE SEMPRE!
 
-**ME**: È venerdì pomeriggio. La migration blocca la tabella users. Abbiamo 847.293 utenti. In America sono le 11 del mattino.
+**PM**: Ma questa volta no.
 
-**UL**: E quindi?
+**ME**: OGNI VOLTA DICONO "QUESTA VOLTA NO"!
 
-**ME**: E quindi se facciamo il deploy, il sistema si blocca. E gli utenti non possono fare login. E il business si ferma.
+**PM**: Ma JN ha testato tutto.
 
-**UL**: E per quanto tempo?
+**ME**: JN?!
 
-**ME**: Non lo so. Dipende da quanto ci mette l'UPDATE. Potrebbero essere minuti. O ore.
+**PM**: Sì. Ha fatto i test.
 
-**UL**: Ore?!
+**ME**: JN HA FATTO I TEST?!
 
-**ME**: Se la tabella è sotto carico, l'UPDATE può essere molto lento.
+**PM**: Sì.
 
-**UL**: E non possiamo farlo in un altro momento?
+**ME**: E QUALI TEST?!
 
-**ME**: Sì. Sabato mattina. O domenica sera. Quando c'è meno traffico.
+**PM**: Non lo so. Ma ha detto che funziona.
 
-**UL**: Ma il cliente vuole la feature per lunedì.
+**ME**: E TU GLI CREDI?!
 
-**ME**: E l'avrà. Se facciamo il deploy domenica sera.
+**PM**: Sì.
 
-**UL**: E chi fa il deploy domenica sera?
+**ME**: E SE SBAGLIA?!
 
-**ME**: Io.
+**PM**: Non sbaglia.
 
-**UL**: Tu?!
+**ME**: SBAGLIA SEMPRE!
 
-**ME**: Sì. Vengo domenica sera. Faccio il deploy. Controllo che tutto funzioni. E lunedì mattina la feature è pronta.
+**PM**: Ma questa volta...
 
-**UL**: E vieni domenica sera?!
+**ME**: QUESTA VOLTA È COME TUTTE LE ALTRE VOLTE!
 
-**ME**: Sì. Meglio che venire sabato mattina per fixare un disastro.
+Il PM mi ha guardato. Io guardavo il PM. Il PM guardava il telefono. Il telefono mostrava:
+- Ora: 17:18
+- Giorno: Venerdì
+- Deploy: richiesto
+- Motivo: urgente
+- Probabilità di disastro: 99.9%
 
-UL mi ha guardato. Io guardavo il calendario. Il calendario mostrava:
-- Venerdì: no
-- Sabato: no
-- Domenica: deploy
-- Lunedì: feature pronta
-
-E tutto era deciso. Niente deploy di venerdì pomeriggio. Deploy domenica sera. E il weekend era salvo. O quasi. Amen.
+E la decisione era chiara. Non fare il deploy. Ma la decisione non spettava a me. Spettava a UL. E UL aveva già approvato. Amen.
 
 ---
 
 **Venerdì - 17:30**
 
-Il PM non era contento. Il PM è venuto da me. Il PM aveva domande.
+Ho chiamato UL. UL ha risposto. Era venerdì. UL voleva andare a casa. Come tutti.
 
-**PM**: Perché non possiamo fare il deploy adesso?
+**UL**: Sì?
 
-**ME**: Te l'ho spiegato. La migration blocca la tabella.
+**ME**: Il PM vuole fare il deploy.
 
-**PM**: Ma è una migration semplice!
+**UL**: E quindi?
 
-**ME**: Semplice non significa sicura.
+**ME**: È venerdì. Alle 17:30.
 
-**PM**: E chi ha scritto la migration?
+**UL**: E quindi?
+
+**ME**: E quindi non si fa il deploy di venerdì.
+
+**UL**: Ma il cliente vuole la feature.
+
+**ME**: Il cliente può aspettare.
+
+**UL**: No. Il cliente è importante.
+
+**ME**: E SE SI ROMPE?!
+
+**UL**: Non si rompe.
+
+**ME**: SI ROMPE SEMPRE!
+
+**UL**: Ma JN ha testato.
+
+**ME**: JN?!
+
+**UL**: Sì.
+
+**ME**: E QUALI TEST?!
+
+**UL**: Non lo so. Ma ha detto che funziona.
+
+**ME**: E TU GLI CREDI?!
+
+**UL**: Sì.
+
+**ME**: E SE SBAGLIA?!
+
+**UL**: Allimenti lo fixi.
+
+**ME**: IO?!
+
+**UL**: Sì. Tu.
+
+**ME**: MA È VENERDÌ!
+
+**UL**: E quindi?
+
+**ME**: E QUINDI VOGLIO ANDARE A CASA!
+
+**UL**: E QUINDI FAI IL DEPLOY VELOCE. E POI VAI A CASA.
+
+**ME**: E SE SI ROMPE?!
+
+**UL**: NON SI ROMPE!
+
+**ME**: SI ROMPE SEMPRE!
+
+**UL**: ALLORA NON LO FARE ROMPERE!
+
+UL ha riattaccato. Io guardavo il telefono. Il telefono mostrava:
+- Ora: 17:32
+- Giorno: Venerdì
+- Deploy: approvato
+- Responsabile: IO
+- Probabilità di disastro: 100%
+
+E la decisione era presa. Fare il deploy. E incrociare le dita. E sperare. E sapere che non serve a nulla sperare. Perché il deploy di venerdì si rompe sempre. Amen.
+
+---
+
+**Venerdì - 17:45**
+
+Ho fatto il deploy. Con JN. Che era "sicuro" che funzionasse.
+
+**TERMINALE**:
+```
+# Build
+npm run build
+> project@1.0.0 build
+> webpack --mode production
+✓ Built in 47s
+
+# Test
+npm test
+> project@1.0.0 test
+> jest
+PASS src/tests/checkout.test.js
+PASS src/tests/payment.test.js
+PASS src/tests/user.test.js
+Test Suites: 3 passed, 3 total
+Tests:       47 passed, 47 total
+
+# Deploy
+kubectl apply -f k8s/production.yaml
+deployment.apps/checkout-service configured
+deployment.apps/payment-service configured
+deployment.apps/user-service configured
+service/checkout-service unchanged
+service/payment-service unchanged
+service/user-service unchanged
+
+# Verifica
+kubectl rollout status deployment/checkout-service -w
+deployment "checkout-service" successfully rolled out
+kubectl rollout status deployment/payment-service -w
+deployment "payment-service" successfully rolled out
+kubectl rollout status deployment/user-service -w
+deployment "user-service" successfully rolled out
+```
+
+**JN**: Vedi? Funziona!
+
+**ME**: Aspetta.
+
+**JN**: Cosa?
+
+**ME**: Aspetta. Sempre aspetta.
+
+**TERMINALE**:
+```
+# Controlla pod
+kubectl get pods -l app=checkout-service
+NAME                               READY   STATUS    RESTARTS   AGE
+checkout-service-abc123-1         1/1     Running   0          2m
+
+# Controlla log
+kubectl logs -l app=checkout-service --tail=20
+2027-01-16 17:47:00 INFO: Service started
+2027-01-16 17:47:01 INFO: Connected to database
+2027-01-16 17:47:02 INFO: Connected to cache
+2027-01-16 17:47:03 INFO: Ready to accept requests
+
+# Controlla health check
+curl -s http://checkout-service:8080/health
+{"status": "UP", "checks": {"database": true, "cache": true}, "timestamp": "2027-01-16T17:47:00Z"}
+```
+
+**JN**: Vedi? Tutto verde!
+
+**ME**: Sì. Per ora.
+
+**JN**: Per ora?!
+
+**ME**: Sì. Il deploy di venerdì si rompe sempre. Ma non subito. Si rompe dopo.
+
+**JN**: Dopo quanto?
+
+**ME**: Dopo. Quando meno te lo aspetti.
+
+**JN**: Ma i test sono passati!
+
+**ME**: I test passano sempre. Poi si rompe in produzione.
+
+**JN**: Ma il rollout è andato bene!
+
+**ME**: Il rollout va sempre bene. Poi si rompe sotto carico.
+
+**JN**: Ma i log sono ok!
+
+**ME**: I log sono sempre ok. Finché non lo sono più.
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Deploy: completato
+- Test: passati
+- Rollout: successo
+- Log: ok
+- Health check: UP
+- Sensazione: terrore
+
+E tutto sembrava ok. Ma io sapevo. Sapevo che il deploy di venerdì si rompe sempre. E che era solo questione di tempo. Amen.
+
+---
+
+**Venerdì - 18:00**
+
+Erano le 18:00. Il deploy era andato. Tutto funzionava. Stavo per andare a casa.
+
+Poi è arrivato il messaggio.
+
+**SUPPORTO**: I clienti non riescono a completare gli ordini. Ricevono errori 500.
+
+**ME**: ERRORI 500?!
+
+**SUPPORTO**: Sì. Dal checkout.
+
+**ME**: MA SE FUNZIONAVA!
+
+**SUPPORTO**: Funzionava. Ora non più.
+
+**ME**: E COSA È CAMBIATO?!
+
+**SUPPORTO**: Non lo so. Ma i clienti chiamano.
+
+**ME**: QUANTI CLIENTI?!
+
+**SUPPORTO**: 47 in 10 minuti.
+
+**ME**: 47?!
+
+**SUPPORTO**: Sì. E continuano a chiamare.
+
+**ME**: ARRIVO!
+
+Ho aperto il terminale. Il terminale mostrava:
+- Health check: UP
+- Pod: Running
+- Log: ERRORI
+
+**TERMINALE**:
+```
+# Controlla log
+kubectl logs -l app=checkout-service --since=15m | grep -i error | tail -30
+2027-01-16 18:02:12 ERROR: Payment gateway timeout
+2027-01-16 18:02:12 ERROR: Cannot process order: payment failed
+2027-01-16 18:02:45 ERROR: Payment gateway timeout
+2027-01-16 18:02:45 ERROR: Cannot process order: payment failed
+2027-01-16 18:03:01 ERROR: Payment gateway timeout
+...
+
+# Conta errori
+kubectl logs -l app=checkout-service --since=15m | grep -i error | wc -l
+89
+
+# Controlla payment gateway
+curl -s -m 5 http://payment-gateway:8080/ping
+curl: (28) Connection timed out
+
+# Controlla payment service
+kubectl logs -l app=payment-service --since=15m | grep -i error | tail -10
+2027-01-16 18:02:00 ERROR: Cannot connect to payment gateway
+2027-01-16 18:02:00 ERROR: Retrying... (1/3)
+2027-01-16 18:02:05 ERROR: Cannot connect to payment gateway
+2027-01-16 18:02:05 ERROR: Retrying... (2/3)
+2027-01-16 18:02:10 ERROR: Cannot connect to payment gateway
+2027-01-16 18:02:10 ERROR: Retrying... (3/3)
+2027-01-16 18:02:15 ERROR: Payment gateway unavailable
+```
+
+**ME**: Il payment gateway è down.
+
+**JN**: DOWN?!
+
+**ME**: Sì. Non risponde.
+
+**JN**: Ma perché?!
+
+**ME**: Non lo so. Ma è down.
+
+**JN**: E ORA?!
+
+**ME**: Ora fixiamo.
+
+**JN**: Ma è venerdì alle 18:00!
+
+**ME**: LO SO!
+
+**JN**: E QUINDI?!
+
+**ME**: E QUINDI FIXIAMO!
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Payment gateway: DOWN
+- Errori: 89
+- Clienti: incazzati
+- Ora: 18:05
+- Venerdì: sì
+
+E la lezione era chiara. Il deploy di venerdì si rompe sempre. E ora toccava a me fixarlo. Amen.
+
+---
+
+**Venerdì - 18:30**
+
+Ho investigato. Il payment gateway era down. Ma perché?
+
+**TERMINALE**:
+```
+# Controlla pod del payment gateway
+kubectl get pods -l app=payment-gateway
+NAME                               READY   STATUS    RESTARTS   AGE
+payment-gateway-xyz789-1          0/1     Running   0          15m
+
+# Controlla log del payment gateway
+kubectl logs payment-gateway-xyz789-1 --tail=50
+2027-01-16 17:45:00 INFO: Starting payment gateway
+2027-01-16 17:45:01 INFO: Loading configuration
+2027-01-16 17:45:02 ERROR: Invalid configuration: MERCHANT_ID is required
+2027-01-16 17:45:02 ERROR: Cannot start: missing required configuration
+2027-01-16 17:45:02 INFO: Retrying in 5 seconds...
+2027-01-16 17:45:07 ERROR: Invalid configuration: MERCHANT_ID is required
+...
+
+# Controlla configurazione
+kubectl get configmap payment-gateway-config -o yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-gateway-config
+data:
+  MERCHANT_ID: ""
+  API_KEY: "sk_live_xxx"
+  ENDPOINT: "https://api.payment.com"
+```
+
+**ME**: Il MERCHANT_ID è vuoto.
+
+**JN**: Vuoto?!
+
+**ME**: Sì. La configurazione non ha il MERCHANT_ID.
+
+**JN**: Ma perché?!
+
+**ME**: Non lo so. Guardo il deploy.
+
+**TERMINALE**:
+```
+# Controlla ultimo deploy
+kubectl describe deployment payment-gateway | grep -A20 "Events"
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  20m   deployment-controller  Scaled up replica set payment-gateway-xyz789 to 1
+
+# Controlla commit
+git log --oneline -5
+abc1234 (HEAD -> main) Aggiorna configurazione payment gateway
+def5678 Fix health check checkout service
+...
+
+# Controlla commit
+git show abc1234 --stat
+ config/payment-gateway.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+git show abc1234
+- MERCHANT_ID: "merchant_123"
++ MERCHANT_ID: ""
+```
+
+**ME**: Qualcuno ha cancellato il MERCHANT_ID.
+
+**JN**: CANCELLATO?!
+
+**ME**: Sì. Nel commit abc1234.
+
+**JN**: Ma chi?!
+
+**ME**: Non lo so. Guardo l'autore.
+
+**TERMINALE**:
+```
+git show abc1234 --format="%an"
+JN
+```
 
 **ME**: JN.
 
-**PM**: E JN non sapeva che era pericolosa?
+**JN**: IO?!
 
-**ME**: JN non ha pensato al numero di utenti.
+**ME**: Sì. Tu.
 
-**PM**: E tu come lo sai?
+**JN**: Ma non ricordo!
 
-**ME**: Perché ho controllato.
+**ME**: Guarda il commit.
 
-**PM**: E JN non ha controllato?
+**JN**: Ma... ma... non volevo!
 
-**ME**: No.
+**ME**: E COSA VOLEVI?!
 
-**PM**: E perché no?
+**JN**: Volevo rimuovere il MERCHANT_ID di test!
 
-**ME**: Perché JN è un junior. E i junior non pensano a queste cose.
+**ME**: E INVECE?!
 
-**PM**: E tu ci pensi?
+**JN**: Invece... ho cancellato tutto.
 
-**ME**: Sì. Perché sono un senior. E i senior pensano a queste cose. E evitano i disastri. O almeno ci provano.
+**ME**: HAI CANCELLATO TUTTO?!
 
-**PM**: E quindi non facciamo il deploy?
+**JN**: Sì. Ma... non volevo!
 
-**ME**: No. Lo facciamo domenica sera.
+**ME**: E I TEST?!
 
-**PM**: Ma è il tuo weekend!
+**JN**: I test... non controllano la configurazione.
 
-**ME**: Preferisco sacrificare una domenica sera che un intero weekend a fixare un disastro.
+**ME**: E QUINDI?!
 
-**PM**: E se non ci fosse nessun disastro?
+**JN**: E quindi... non hanno fallito.
 
-**ME**: Non c'è mai "nessun disastro" con i deploy di venerdì pomeriggio. C'è sempre un disastro. È la legge di Murphy. È la legge dell'IT. È la legge del venerdì pomeriggio.
+**ME**: E ORA?!
 
-Il PM mi ha guardato. Io guardavo l'orologio. L'orologio mostrava:
-- Ora: 17:35
-- Giorno: venerdì
-- Deploy: no
-- Weekend: salvo
-- Domenica: lavoro
+**JN**: Ora... fixiamo?
 
-E tutto era deciso. Ma il PM non era contento. Perché il PM voleva il deploy. E il cliente voleva la feature. E il venerdì pomeriggio voleva il disastro. E io volevo il weekend. E non si può avere tutto. Amen.
+**ME**: SÌ. ORA FIXIAMO!
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Autore: JN
+- Errore: cancellato MERCHANT_ID
+- Test: non hanno fallito
+- Produzione: DOWN
+- Venerdì: sì
+
+E la lezione era chiara. JN aveva cancellato la configurazione. E i test non l'avevano beccato. E ora toccava a me fixarlo. Amen.
 
 ---
 
-**Domenica - 20:00**
+**Venerdì - 19:00**
 
-Domenica sera. 20:00. Il traffico era al minimo. Il caffè era pronto. La motivazione era... beh, c'era.
-
-**TERMINALE**:
-```
-# Controlla traffico
-curl -s http://prometheus:9090/api/v1/query?query=rate(http_requests_total[5m]) | jq '.data.result[].value[1]' | sort -n | tail -5
-"12"
-"15"
-"18"
-"23"
-"31"
-
-# Traffico normale: 200+ richieste al minuto
-# Traffico attuale: 31 richieste al minuto
-# Ok, è il momento
-
-# Controlla utenti online
-psql -c "SELECT COUNT(*) FROM sessions WHERE last_activity > NOW() - INTERVAL '5 minutes'"
- count
--------
-   127
-```
-
-**ME**: 127 utenti online. Traffico al minimo. Possiamo procedere.
-
-**TL**: (su Slack) Ok, procedi. Io monitoro.
+Ho fixato la configurazione. E riavviato il payment gateway.
 
 **TERMINALE**:
 ```
-# Backup prima del deploy
-pg_dump -Fc users > /backup/users_20270116.dump
+# Fix configurazione
+kubectl patch configmap payment-gateway-config --type=json -p='[{"op": "replace", "path": "/data/MERCHANT_ID", "value": "merchant_123"}]'
 
-# Esegui migration in una transazione
-psql << 'EOF'
-BEGIN;
--- Add column without default (instant)
-ALTER TABLE users ADD COLUMN preferences JSONB;
+# Riavvia payment gateway
+kubectl rollout restart deployment/payment-gateway
 
--- Add index CONCURRENTLY (non-blocking)
-CREATE INDEX CONCURRENTLY idx_users_preferences ON users USING GIN (preferences);
+# Verifica
+kubectl rollout status deployment/payment-gateway -w
+deployment "payment-gateway" successfully rolled out
 
--- Update in batches
-DO $$
-DECLARE
-  batch_size INT := 10000;
-  offset_val INT := 0;
-  total_updated INT := 0;
-BEGIN
-  WHILE EXISTS (SELECT 1 FROM users WHERE preferences IS NULL LIMIT 1) LOOP
-    UPDATE users 
-    SET preferences = '{"theme": "light", "notifications": true}'
-    WHERE id IN (
-      SELECT id FROM users WHERE preferences IS NULL LIMIT batch_size
-    );
-    
-    GET DIAGNOSTICS total_updated = ROW_COUNT;
-    offset_val := offset_val + total_updated;
-    
-    RAISE NOTICE 'Updated % rows, total: %', total_updated, offset_val;
-    
-    COMMIT;
-    BEGIN;
-  END LOOP;
-END $$;
+# Controlla log
+kubectl logs -l app=payment-gateway --tail=10
+2027-01-16 19:02:00 INFO: Starting payment gateway
+2027-01-16 19:02:01 INFO: Loading configuration
+2027-01-16 19:02:02 INFO: Configuration loaded successfully
+2027-01-16 19:02:02 INFO: Connected to payment provider
+2027-01-16 19:02:03 INFO: Ready to accept requests
 
--- Set default for new rows
-ALTER TABLE users ALTER COLUMN preferences SET DEFAULT '{}';
+# Test
+curl -s http://payment-gateway:8080/health
+{"status": "UP", "checks": {"provider": true}, "timestamp": "2027-01-16T19:02:00Z"}
 
-COMMIT;
-EOF
-```
-
-**ME**: Migration completata. In batch. Senza bloccare la tabella.
-
-**TL**: Tempo?
-
-**ME**: 23 minuti. Per 847.293 utenti.
-
-**TL**: E il traffico?
-
-**ME**: Controllo.
-
-**TERMINALE**:
-```
-# Controlla errori durante migration
-kubectl logs -l app=api --since=30m | grep -i error | wc -l
+# Controlla errori recenti
+kubectl logs -l app=checkout-service --since=5m | grep -i error | wc -l
 0
 
-# Controlla login
-curl -s http://api:8080/health
-{"status": "UP", "checks": {"database": true, "cache": true}}
-
-# Controlla utenti online
-psql -c "SELECT COUNT(*) FROM sessions WHERE last_activity > NOW() - INTERVAL '5 minutes'"
- count
+# Controlla ordini
+kubectl exec -it postgres-0 -- psql -U orders -c "SELECT COUNT(*) FROM orders WHERE created_at > '2027-01-16 19:00:00' AND status = 'completed'"
+count
 -------
-   143
+23
 ```
 
-**ME**: Zero errori. 143 utenti online. Tutto funzionante.
+**ME**: Payment gateway ripristinato. Zero errori. 23 ordini completati.
 
-**TL**: Ottimo. Deploy completato.
+**JN**: Funziona!
 
-**ME**: Sì. E senza disastri.
+**ME**: Sì. Per ora.
 
-**TL**: E senza venerdì pomeriggio.
+**JN**: Per ora?!
 
-**ME**: Esattamente.
+**ME**: Sì. Il deploy di venerdì ha sempre un secondo atto.
 
-Il TL mi ha risposto su Slack. Io guardavo il terminale. Il terminale mostrava:
-- Migration: completata
+**JN**: Un secondo atto?!
+
+**ME**: Sì. La prima cosa che si rompe è solo l'inizio.
+
+**JN**: E COSA SI ROMPE DOPO?!
+
+**ME**: Non lo so. Ma qualcosa si rompe.
+
+**JN**: Ma perché?!
+
+**ME**: Perché è venerdì. E abbiamo fatto il deploy. E il deploy di venerdì si rompe sempre. Due volte.
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Payment gateway: UP
 - Errori: zero
-- Tempo: 23 minuti
-- Venerdì: evitato
-- Domenica: sacrificata
+- Ordini: 23
+- Sensazione: ancora terrore
 
-E tutto funzionava. E la feature era pronta per lunedì. E il disastro era stato evitato. E la lezione era chiara. Il deploy di venerdì pomeriggio è sempre una pessima idea. E la domenica sera è sempre meglio. Amen.
+E tutto sembrava ok. Ma io sapevo. Sapevo che il deploy di venerdì ha sempre un secondo atto. Amen.
 
 ---
 
-**Lunedì - 09:00**
+**Venerdì - 20:30**
 
-Lunedì mattina. 09:00. La feature era in produzione. Il cliente era contento. Il PM era contento. UL era contento.
+Erano le 20:30. Il payment gateway funzionava. Gli ordini arrivavano. Stavo per andare a casa. Di nuovo.
 
-**UL**: Ottimo lavoro! La feature è online!
+Poi è arrivato il messaggio.
 
-**ME**: Sì. L'abbiamo deployata domenica sera.
+**SUPPORTO**: I clienti ricevono email di conferma sbagliate.
 
-**UL**: E tutto ha funzionato?
+**ME**: SBAGLIATE?!
 
-**ME**: Sì. Zero errori. Zero downtime.
+**SUPPORTO**: Sì. Ricevono email con il nome di un altro cliente.
 
-**UL**: E il cliente?
+**ME**: UN ALTRO CLIENTE?!
 
-**ME**: Il cliente è contento. La feature funziona.
+**SUPPORTO**: Sì. Mario Rossi riceve l'email di conferma di Giuseppe Verdi.
 
-**UL**: E il PM?
+**ME**: E COME È POSSIBILE?!
 
-**ME**: Il PM è contento. Ha la sua feature.
+**SUPPORTO**: Non lo so. Ma i clienti sono incazzati.
 
-**UL**: E tu?
+**ME**: QUANTI CLIENTI?!
 
-**ME**: Io sono stanco. Ma contento.
+**SUPPORTO**: 12 in 30 minuti.
 
-**UL**: E la lezione?
+**ME**: 12?!
 
-**ME**: La lezione è: non fare mai il deploy di venerdì pomeriggio.
+**SUPPORTO**: Sì. E continuano a chiamare.
 
-**UL**: E se il PM insiste?
+**ME**: ARRIVO!
 
-**ME**: Allora dici: "Ok, ma lo facciamo domenica sera." E il PM accetta. O non accetta. Ma almeno non fai il deploy di venerdì pomeriggio.
+Ho aperto il terminale. Il terminale mostrava:
+- Payment gateway: UP
+- Checkout: UP
+- Email: SBAGLIATE
 
-**UL**: E se non c'è scelta?
+**TERMINALE**:
+```
+# Controlla log del notification service
+kubectl logs -l app=notification-service --since=30m | grep -i email | tail -20
+2027-01-16 20:15:00 INFO: Sending order confirmation email to order #12345
+2027-01-16 20:15:01 INFO: Email sent to mario.rossi@email.com
+2027-01-16 20:15:30 INFO: Sending order confirmation email to order #12346
+2027-01-16 20:15:31 INFO: Email sent to mario.rossi@email.com
+2027-01-16 20:16:00 INFO: Sending order confirmation email to order #12347
+2027-01-16 20:16:01 INFO: Email sent to mario.rossi@email.com
+...
 
-**ME**: C'è sempre una scelta. La scelta è: disastro venerdì o successo domenica. E tu scegli domenica.
+# Controlla ordini
+kubectl exec -it postgres-0 -- psql -U orders -c "SELECT id, customer_email, customer_name FROM orders WHERE id IN (12345, 12346, 12347)"
+id    | customer_email           | customer_name
+------|--------------------------|---------------
+12345 | mario.rossi@email.com    | Mario Rossi
+12346 | giuseppe.verdi@email.com | Giuseppe Verdi
+12347 | anna.bianchi@email.com   | Anna Bianchi
 
-UL mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
-- Feature: online
+# Controlla codice
+cat services/notification/src/email.js | grep -A20 "sendOrderConfirmation"
+async function sendOrderConfirmation(orderId) {
+  const order = await getOrder(orderId);
+  const template = await loadTemplate('order-confirmation');
+  
+  // BUG: Using cached customer data instead of order data
+  const customer = await getCustomerFromCache();
+  
+  const email = {
+    to: customer.email,  // WRONG: should be order.customer_email
+    subject: `Conferma ordine #${orderId}`,
+    body: template.render({ ...order, customer })
+  };
+  
+  return sendEmail(email);
+}
+```
+
+**ME**: Il notification service usa la cache sbagliata.
+
+**JN**: LA CACHE?!
+
+**ME**: Sì. Prende il cliente dalla cache invece che dall'ordine.
+
+**JN**: Ma perché?!
+
+**ME**: Non lo so. Guardo il commit.
+
+**TERMINALE**:
+```
+# Controlla commit
+git log --oneline --all -- services/notification/src/email.js | head -5
+abc5678 (HEAD -> main) Ottimizza recupero cliente in notification service
+def9012 Fix email template
+
+# Controlla commit
+git show abc5678
+- const customer = await getCustomer(order.customer_id);
++ const customer = await getCustomerFromCache();
+
+# Controlla autore
+git show abc5678 --format="%an"
+JN
+```
+
+**ME**: JN.
+
+**JN**: IO DI NUOVO?!
+
+**ME**: Sì. Tu di nuovo.
+
+**JN**: Ma volevo ottimizzare!
+
+**ME**: OTTIMIZZARE?!
+
+**JN**: Sì. La query al database era lenta.
+
+**ME**: E QUINDI?!
+
+**JN**: E quindi ho usato la cache.
+
+**ME**: E LA CACHE COSA CONTIENE?!
+
+**JN**: Il cliente.
+
+**ME**: QUALE CLIENTE?!
+
+**JN**: Il... il... ultimo cliente?
+
+**ME**: L'ULTIMO CLIENTE?!
+
+**JN**: Sì. La cache contiene l'ultimo cliente.
+
+**ME**: E QUINDI?!
+
+**JN**: E quindi... tutti ricevono l'email dell'ultimo cliente.
+
+**ME**: ESATTO!
+
+**JN**: Ma... non volevo!
+
+**ME**: E I TEST?!
+
+**JN**: I test... non controllano le email.
+
+**ME**: E QUINDI?!
+
+**JN**: E quindi... non hanno fallito.
+
+**ME**: E ORA?!
+
+**JN**: Ora... fixiamo?
+
+**ME**: SÌ. ORA FIXIAMO!
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Autore: JN
+- Errore: cache sbagliata
+- Test: non hanno fallito
+- Email: sbagliate
+- Venerdì: ancora sì
+
+E la lezione era chiara. JN aveva ottimizzato. E aveva rotto. E ora toccava a me fixarlo. Di nuovo. Amen.
+
+---
+
+**Venerdì - 21:30**
+
+Ho fixato il notification service. E riavviato.
+
+**TERMINALE**:
+```
+# Fix notification service
+cat > services/notification/src/email.js << 'EOF'
+async function sendOrderConfirmation(orderId) {
+  const order = await getOrder(orderId);
+  const template = await loadTemplate('order-confirmation');
+  
+  // FIX: Use order customer data, not cache
+  const customer = {
+    email: order.customer_email,
+    name: order.customer_name
+  };
+  
+  const email = {
+    to: customer.email,
+    subject: `Conferma ordine #${orderId}`,
+    body: template.render({ ...order, customer })
+  };
+  
+  return sendEmail(email);
+}
+EOF
+
+# Deploy
+kubectl rollout restart deployment/notification-service
+
+# Verifica
+kubectl rollout status deployment/notification-service -w
+deployment "notification-service" successfully rolled out
+
+# Test
+kubectl logs -l app=notification-service --tail=10
+2027-01-16 21:32:00 INFO: Sending order confirmation email to order #12350
+2027-01-16 21:32:01 INFO: Email sent to luca.colombo@email.com
+2027-01-16 21:32:30 INFO: Sending order confirmation email to order #12351
+2027-01-16 21:32:31 INFO: Email sent to elena.russo@email.com
+```
+
+**ME**: Notification service fixato. Email corrette.
+
+**JN**: Funziona!
+
+**ME**: Sì. Per ora.
+
+**JN**: C'è un terzo atto?!
+
+**ME**: Spero di no.
+
+**JN**: Speri?!
+
+**ME**: Sì. Spero. Ma non credo.
+
+**JN**: Perché?!
+
+**ME**: Perché è venerdì. E abbiamo fatto il deploy. E il deploy di venerdì si rompe sempre. Tre volte.
+
+**JN**: TRE VOLTE?!
+
+**ME**: Sì. Tre volte. La prima è l'errore ovvio. La seconda è l'errore nascosto. La terza è l'errore che non ti aspetti.
+
+**JN**: E QUALE È IL TERZO?!
+
+**ME**: Non lo so. Ma arriverà.
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Notification service: UP
+- Email: corrette
 - Errori: zero
-- Clienti: contenti
-- Venerdì: evitato
+- Sensazione: ancora terrore
+
+E tutto sembrava ok. Ma io sapevo. Sapevo che il deploy di venerdì ha sempre un terzo atto. Amen.
+
+---
+
+**Sabato - 03:00**
+
+Erano le 03:00 di sabato. Ero a casa. A letto. Dormivo. O quasi.
+
+Poi è arrivato il messaggio.
+
+**SUPPORTO**: Il sistema è down.
+
+**ME**: DOWN?!
+
+**SUPPORTO**: Sì. Tutto down.
+
+**ME**: TUTTO?!
+
+**SUPPORTO**: Sì. Checkout, payment, notification. Tutto.
+
+**ME**: E COSA È SUCCESSO?!
+
+**SUPPORTO**: Non lo so. Ma non funziona nulla.
+
+**ME**: ARRIVO!
+
+Mi sono vestito. Sono andato in ufficio. Erano le 03:30 di sabato. L'ufficio era vuoto. Il caffè era finito. La motivazione era sotto zero.
+
+**TERMINALE**:
+```
+# Controlla cluster
+kubectl get nodes
+NAME       STATUS   ROLES    AGE   VERSION
+node-1     Ready    master   1y    v1.28.0
+node-2     Ready    <none>   1y    v1.28.0
+node-3     NotReady <none>   1y    v1.28.0
+
+# Controlla pod
+kubectl get pods -A | grep -v Running
+NAMESPACE   NAME                               READY   STATUS      RESTARTS   AGE
+default     checkout-service-abc123-1         0/1     CrashLoopBackOff   5   9h
+default     payment-service-def456-1          0/1     CrashLoopBackOff   5   9h
+default     notification-service-ghi789-1    0/1     CrashLoopBackOff   5   9h
+
+# Controlla log
+kubectl logs checkout-service-abc123-1 --tail=20
+2027-01-17 03:00:00 ERROR: Cannot connect to database: too many connections
+2027-01-17 03:00:01 ERROR: Service shutting down
+2027-01-17 03:00:02 INFO: Service stopped
+
+# Controlla database
+kubectl exec -it postgres-0 -- psql -U admin -c "SELECT COUNT(*) FROM pg_stat_activity"
+count
+-------
+497
+
+# Controlla max connections
+kubectl exec -it postgres-0 -- psql -U admin -c "SHOW max_connections"
+max_connections
+----------------
+500
+```
+
+**ME**: Il database ha finito le connessioni.
+
+**JN**: (al telefono) CONNESS...?!
+
+**ME**: Sì. 497 su 500.
+
+**JN**: E PERCHÉ?!
+
+**ME**: Non lo so. Guardo cosa sta usando le connessioni.
+
+**TERMINALE**:
+```
+# Controlla connessioni
+kubectl exec -it postgres-0 -- psql -U admin -c "SELECT usename, application_name, COUNT(*) FROM pg_stat_activity GROUP BY usename, application_name ORDER BY COUNT(*) DESC"
+usename   | application_name     | count
+----------|---------------------|-------
+checkout  | checkout-service    | 200
+payment   | payment-service     | 150
+notification | notification-service | 100
+admin     | psql                | 1
+
+# Controlla pool size
+kubectl get deployment checkout-service -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="DB_POOL_SIZE")].value}'
+200
+
+# Controlla repliche
+kubectl get deployment checkout-service -o jsonpath='{.spec.replicas}'
+1
+
+# Controlla payment pool
+kubectl get deployment payment-service -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="DB_POOL_SIZE")].value}'
+150
+
+# Controlla notification pool
+kubectl get deployment notification-service -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="DB_POOL_SIZE")].value}'
+100
+```
+
+**ME**: I pool size sono troppo grandi.
+
+**JN**: TROPPO GRANDI?!
+
+**ME**: Sì. Checkout usa 200 connessioni. Payment 150. Notification 100. Totale: 450. Più le connessioni di sistema. Totale: 497.
+
+**JN**: Ma perché?!
+
+**ME**: Non lo so. Guardo il commit.
+
+**TERMINALE**:
+```
+# Controlla commit
+git log --oneline --all -- "k8s/*.yaml" | head -5
+abc9999 (HEAD -> main) Aumenta pool size per performance
+def1234 Fix health check
+
+# Controlla commit
+git show abc9999
+- DB_POOL_SIZE: "10"
++ DB_POOL_SIZE: "200"
+
+# Controlla autore
+git show abc9999 --format="%an"
+JN
+```
+
+**ME**: JN.
+
+**JN**: IO DI NUOVO?!
+
+**ME**: Sì. Tu di nuovo.
+
+**JN**: Ma volevo migliorare le performance!
+
+**ME**: PERFORMANCE?!
+
+**JN**: Sì. Il database era lento.
+
+**ME**: E QUINDI?!
+
+**JN**: E quindi ho aumentato il pool size.
+
+**ME**: DA 10 A 200?!
+
+**JN**: Sì. Per avere più connessioni.
+
+**ME**: E SE TUTTI I SERVIZI USANO 200 CONNESSIONI?!
+
+**JN**: Non ci ho pensato.
+
+**ME**: E IL DATABASE HA 500 CONNESSIONI MASSIME?!
+
+**JN**: Non lo sapevo!
+
+**ME**: E ORA?!
+
+**JN**: Ora... fixiamo?
+
+**ME**: SÌ. ORA FIXIAMO! DI SABATO ALLE 03:30!
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Autore: JN
+- Errore: pool size troppo grande
+- Test: non hanno fallito
+- Database: DOWN
+- Sabato: sì, alle 03:30
+
+E la lezione era chiara. JN aveva ottimizzato. Di nuovo. E aveva rotto. Di nuovo. E ora toccava a me fixarlo. Di sabato. Alle 03:30. Amen.
+
+---
+
+**Sabato - 04:00**
+
+Ho fixato i pool size. E riavviato i servizi.
+
+**TERMINALE**:
+```
+# Fix pool size
+kubectl set env deployment/checkout-service DB_POOL_SIZE=20
+kubectl set env deployment/payment-service DB_POOL_SIZE=15
+kubectl set env deployment/notification-service DB_POOL_SIZE=10
+
+# Riavvia
+kubectl rollout restart deployment/checkout-service
+kubectl rollout restart deployment/payment-service
+kubectl rollout restart deployment/notification-service
+
+# Verifica
+kubectl rollout status deployment/checkout-service -w
+deployment "checkout-service" successfully rolled out
+kubectl rollout status deployment/payment-service -w
+deployment "payment-service" successfully rolled out
+kubectl rollout status deployment/notification-service -w
+deployment "notification-service" successfully rolled out
+
+# Controlla connessioni
+kubectl exec -it postgres-0 -- psql -U admin -c "SELECT COUNT(*) FROM pg_stat_activity"
+count
+-------
+47
+
+# Controlla health
+curl -s http://checkout-service:8080/health
+{"status": "UP", "checks": {"database": true, "cache": true}, "timestamp": "2027-01-17T04:05:00Z"}
+```
+
+**ME**: Servizi ripristinati. Pool size corretti. Database ok.
+
+**JN**: Funziona!
+
+**ME**: Sì. Per ora.
+
+**JN**: C'è un quarto atto?!
+
+**ME**: Spero di no.
+
+**JN**: Ma hai detto tre!
+
+**ME**: Sì. Ma con JN non si sa mai.
+
+**JN**: Ehi!
+
+**ME**: È la verità.
+
+**JN**: Ma...
+
+**ME**: Ma niente. Il deploy di venerdì si rompe sempre. E tu hai fatto tre errori. Tre. In un solo deploy.
+
+**JN**: Ma...
+
+**ME**: Niente ma. Impara. E la prossima volta, non fare il deploy di venerdì.
+
+**JN**: Ma UL ha approvato!
+
+**ME**: E TU AVRESTI DOVUTO DIRE NO!
+
+**JN**: Ma...
+
+**ME**: Niente ma. Il deploy di venerdì è vietato. Sempre. Anche se UL approva. Anche se il PM vuole. Anche se è urgente. Il deploy di venerdì si rompe sempre. E tu l'hai imparato sulla tua pelle. E sulla mia. Alle 03:30 di sabato.
+
+JN mi ha guardato. Io guardavo il terminale. Il terminale mostrava:
+- Servizi: UP
+- Pool size: corretti
+- Database: ok
+- Ora: 04:10
+- Giorno: Sabato
+
+E tutto funzionava. Ma avevo imparato una lezione. La lezione che il deploy di venerdì è vietato. Sempre. E che JN va educato. E che la prossima volta, dico no. Amen.
+
+---
+
+**Lunedì - La Riunione**
+
+Lunedì. UL ha chiamato una riunione. Per discutere del deploy di venerdì.
+
+**UL**: Allora. Chi ha fatto il deploy di venerdì?
+
+**ME**: Io. Con JN.
+
+**UL**: E perché?
+
+**ME**: Perché era urgente. E tu avevi approvato.
+
+**UL**: E QUANTI ERRORI?!
+
+**ME**: Tre. MERCHANT_ID cancellato. Cache sbagliata. Pool size troppo grande.
+
+**UL**: TRE?!
+
+**ME**: Sì. Tre.
+
+**UL**: E CHI LI HA FATTI?!
+
+**ME**: JN.
+
+**UL**: JN?!
+
+**JN**: Sì. Ma non volevo!
+
+**UL**: E QUANTE ORE DI DOWNTIME?!
+
+**ME**: Zero. Ma ho lavorato fino alle 04:10 di sabato.
+
+**UL**: DI SABATO?!
+
+**ME**: Sì. Di sabato. Alle 03:30.
+
+**UL**: E PERCHÉ?!
+
+**ME**: Perché il database aveva finito le connessioni.
+
+**UL**: E QUANTI CLIENTI HANNO AVUTO PROBLEMI?!
+
+**ME**: 47 per il payment gateway. 12 per le email sbagliate. Tutti per il database.
+
+**UL**: E LA MORALE?!
+
+**ME**: La morale è: non fare il deploy di venerdì. Mai.
+
+**UL**: E LA PROSSIMA VOLTA?!
+
+**ME**: La prossima volta dico no. Anche se è urgente. Anche se tu approvi. Anche se il PM vuole. Il deploy di venerdì è vietato.
+
+**UL**: E SE È DAVVERO URGENTE?!
+
+**ME**: Allora aspettiamo sabato mattina. Quando c'è tempo di fixare. E non alle 03:30.
+
+**UL**: E JN?!
+
+**ME**: JN va educato. Di nuovo.
+
+**UL**: E COME?!
+
+**ME**: Con una regola semplice: niente deploy di venerdì. Mai. E niente ottimizzazioni senza test. E niente configurazioni senza verifica.
+
+**UL**: E CHI CONTROLLA?!
+
+**ME**: Io. E il TL. E il code review. E i test. E il CI/CD. E il monitoraggio. E tutto quello che serve per non fare un altro deploy di venerdì che si rompe tre volte.
+
+UL mi ha guardato. Io guardavo UL. UL guardava JN. JN guardava il tavolo. Il tavolo mostrava:
+- Deploy: venerdì
+- Errori: tre
+- Downtime: zero
+- Lavoro: sabato alle 03:30
 - Lezione: imparata
 
-E tutto era risolto. Ma la lezione era chiara. Il deploy di venerdì pomeriggio è sempre una pessima idea. E la domenica sera è sempre meglio. E se il PM insiste, tu dici di no. E se UL insiste, tu spieghi i rischi. E se tutti insistono, tu fai il deploy. E poi fixi il disastro. Ma almeno ci hai provato. Amen.
+E la decisione era chiara. Niente più deploy di venerdì. Mai. Amen.
 
 ---
 
-**Martedì - L'Educazione**
-
-Martedì. Ho educato JN. Di nuovo. Sempre.
-
-**ME**: JN, vieni qui.
-
-**JN**: Sì?
-
-**ME**: Hai scritto la migration del weekend?
-
-**JN**: Sì. Perché?
-
-**ME**: La migration faceva un UPDATE su 847.293 utenti.
-
-**JN**: Sì. Per il default.
-
-**ME**: E non hai pensato che poteva bloccare la tabella?
-
-**JN**: No. Era un UPDATE semplice.
-
-**ME**: JN, non esistono UPDATE semplici su 847.293 righe.
-
-**JN**: Ah.
-
-**ME**: E non esistono deploy semplici di venerdì pomeriggio.
-
-**JN**: Ah.
-
-**ME**: E non esistono migration che non vanno testate.
-
-**JN**: Ah.
-
-**ME**: Tre cose da imparare. Primo: conta le righe prima di fare UPDATE.
-
-**JN**: Contare le righe?
-
-**ME**: Sì. `SELECT COUNT(*) FROM tabella`. Se sono più di 10.000, pensaci due volte.
-
-**JN**: Ok.
-
-**ME**: Secondo: fai le migration in batch. Non un UPDATE gigante.
-
-**JN**: In batch?
-
-**ME**: Sì. 10.000 righe alla volta. Con COMMIT intermedi. Così non blocchi la tabella.
-
-**JN**: Ok.
-
-**ME**: Terzo: non fare mai il deploy di venerdì pomeriggio.
-
-**JN**: Mai?
-
-**ME**: Mai. A meno che non sia un'emergenza vera. E "il cliente vuole la feature" non è un'emergenza.
-
-**JN**: E se il PM insiste?
-
-**ME**: Allora dici: "Lo facciamo domenica sera." E il PM accetta.
-
-**JN**: E se non accetta?
-
-**ME**: Allora vieni da me. E io parlo con UL. E UL decide. E se UL dice di fare il deploy, allora lo fai. Ma documenti tutto. E ti prepari al disastro.
-
-**JN**: Al disastro?!
-
-**ME**: Sì. Perché il deploy di venerdì pomeriggio è sempre un disastro. E tu devi essere pronto.
-
-JN mi ha guardato. Io guardavo JN. JN guardava il terminale. Il terminale mostrava:
-- Migration: corretta
-- Deploy: domenica
-- Disastro: evitato
-- JN: educato
-
-E tutto era risolto. Ma la lezione era chiara. I junior sbagliano. E i senior li correggono. E i deploy di venerdì pomeriggio sono sempre una pessima idea. E la domenica sera è sempre meglio. Amen.
-
----
-
-## Il costo del deploy di venerdì pomeriggio
+## Il costo del deploy di venerdì
 
 | Voce | Valore |
 |------|--------|
-| Migration | ALTER TABLE + UPDATE su 847.293 righe |
-| Autore | JN |
-| Rischio | Blocco tabella users per minuti/ore |
-| Ora proposta | Venerdì 16:45 |
-| Traffico America | 11:00 AM (alto) |
-| Decisione | NO |
-| Deploy effettivo | Domenica 20:00 |
-| Tempo migration | 23 minuti |
-| Errori | 0 |
-| Downtime | 0 |
-| Weekend sacrificato | 1 domenica sera |
-| Lezione imparata | NO DEPLOY VENERDÌ |
-| **Totale** | **1 domenica sera + 0 disastri + 1 junior educato** |
+| Data deploy | Venerdì 16/01/2027, 17:45 |
+| Ora inizio | 17:45 |
+| Ora fine | Sabato 04:10 |
+| Tempo totale | 10 ore 25 minuti |
+| Errori | 3 |
+| Errori JN | 3 |
+| Clienti affetti | 59+ |
+| Email sbagliate | 12 |
+| Connessioni esaurite | 497/500 |
+| Pool size sbagliato | 200 (checkout), 150 (payment), 100 (notification) |
+| Pool size corretto | 20, 15, 10 |
+| Reazione UL | "TRE?!" |
+| Reazione ME | "Lo sapevo." |
+| Reazione JN | "Non volevo!" |
+| Soluzione | Fix x3 + educazione |
+| Lezione imparata | NESSUN DEPLOY DI VENERDÌ. MAI. |
+| **Totale** | **3 errori + 10 ore + 59+ clienti + 1 JN educato** |
 
-**Morale**: Il deploy di venerdì pomeriggio è come il gioco d'azzardo. Puoi vincere una volta. Puoi vincere due volte. Ma alla fine perdi. E quando perdi, perdi tutto. Il sistema si blocca. Gli utenti non possono fare login. Il business si ferma. UL chiama. Il CTO chiama. Il CEO chiama. E tu rispondi: "Era un deploy semplice." E UL dice: "SEMPLICE?!" E tu dici: "Sì. Solo una migration." E UL dice: "E LA MIGRATION HA BLOCCATO LA TABELLA?!" E tu dici: "Sì. Perché aveva 847.293 righe." E UL dice: "E NON HAI CONTROLLATO?!" E tu dici: "JN l'ha scritta." E UL dice: "E JN NON HA CONTROLLATO?!" E tu dici: "JN è un junior." E UL dice: "E TU SEI UN SENIOR! E I SENIOR CONTROLLANO!" E hai ragione. I senior controllano. E i senior evitano i deploy di venerdì pomeriggio. E i senior sacrificano la domenica sera. Perché la domenica sera è meglio del disastro. Sempre. Amen.
+**Morale**: Il deploy di venerdì è vietato. Sempre. Anche se è urgente. Anche se UL approva. Anche se il PM vuole. Anche se JN ha testato. Il deploy di venerdì si rompe sempre. Tre volte. La prima è l'errore ovvio. La seconda è l'errore nascosto. La terza è l'errore che non ti aspetti. E se sei fortunato, finisci alle 04:10 di sabato. Se non sei fortunato, finisci domenica. O lunedì. O mai. Perché il deploy di venerdì è come una bomba a orologeria. E l'orologio è sempre in ritardo. E la bomba esplode sempre. E tu sei lì, alle 03:30 di sabato, a fixare. E ti chiedi: "Perché ho fatto il deploy di venerdì?" E la risposta è semplice: perché era urgente. E l'urgenza è il nemico. E la prossima volta, non è urgente. La prossima volta, è sabato mattina. O lunedì. O mai. Ma non venerdì. Mai più venerdì. Amen.
 
 ---
 
@@ -508,4 +1176,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-documentazione-che-nessuno-leggeva.md)**
+**[Storie 2026](index.md) | [Precedente](99-il-health-check-che-mentiva-sempre.md) | [Prossima](101-la-password-che-scade-sempre-di-venerdi.md)**
