@@ -2,7 +2,7 @@
 
 **Data**: 17/04/2026
 
-**[Storie 2026](index.md) | [Precedente](112-il-backup-che-non-e-mai-stato-testato.md) | [Prossima](114-la-cache-che-ha-cachato-tutto.md)**
+**[Storie 2026](index.md) | [Precedente](112-il-backup-che-non-e-mai-stato-testato.md) | [Prossima](114-il-processo-zombie-che-mangiava-la-cpu.md)**
 
 ---
 
@@ -896,4 +896,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](112-il-backup-che-non-e-mai-stato-testato.md) | [Prossima](114-la-cache-che-ha-cachato-tutto.md)**
+**[Storie 2026](index.md) | [Precedente](112-il-backup-che-non-e-mai-stato-testato.md) | [Prossima](114-il-processo-zombie-che-mangiava-la-cpu.md)**
