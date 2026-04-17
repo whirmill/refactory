@@ -2,7 +2,7 @@
 
 **Data**: 19/09/2026
 
-**[Home](../index.md) | [Precedente](82-la-cache-che-non-scadeva-mai.md)]**
+**[Home](../index.md) | [Precedente](82-la-cache-che-non-scadeva-mai.md) | [Prossima](84-il-vendor-che-e-scomparso.md)]**
 
 ---
 
