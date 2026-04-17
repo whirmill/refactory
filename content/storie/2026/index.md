@@ -16,6 +16,22 @@
 
 ---
 
+### [Il Load Balancer Che Aveva Un Preferito](110-il-load-balancer-che-aveva-un-preferito.md)
+
+**Data**: 27/03/2027
+
+Un load balancer con IP hash. Un bot che fa 10.000 richieste al secondo. Un server che muore mentre gli altri vivono inutili. E JN impara che l'IP hash è pericoloso.
+
+---
+
+### [La Queue Che Ha Perso I Messaggi](109-la-queue-che-ha-perso-i-messaggi.md)
+
+**Data**: 20/03/2027
+
+Una queue con auto-ack. Messaggi che spariscono. 5000 ordini persi. E JN impara che l'ack va dopo il processamento, non prima.
+
+---
+
 ### [Il Certificate Che Non Veniva Rinnovato](108-il-certificate-che-non-veniva-rinnovato.md)
 
 **Data**: 13/03/2027
@@ -314,7 +330,7 @@ Il certificato SSL è scaduto. Di nuovo. Per la quinta volta quest'anno.
 
 ## Statistiche 2026
 
-- **Storie pubblicate**: 35
+- **Storie pubblicate**: 37
 - **Server morti**: 4
 - **Server infettati da ransomware**: tutti
 - **Anni di dati persi**: 38 (15 ransomware + 23 sistema legacy)
