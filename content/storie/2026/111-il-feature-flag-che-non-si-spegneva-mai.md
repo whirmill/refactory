@@ -2,7 +2,7 @@
 
 **Data**: 03/04/2026
 
-**[Storie 2026](index.md) | [Precedente](110-il-load-balancer-che-aveva-un-preferito.md) | [Prossima](112-la-migration-che-ha-cancellato-tutto.md)**
+**[Storie 2026](index.md) | [Precedente](110-il-load-balancer-che-aveva-un-preferito.md) | [Prossima](112-il-backup-che-non-e-mai-stato-testato.md)**
 
 ---
 
@@ -741,4 +741,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](110-il-load-balancer-che-aveva-un-preferito.md) | [Prossima](112-la-migration-che-ha-cancellato-tutto.md)**
+**[Storie 2026](index.md) | [Precedente](110-il-load-balancer-che-aveva-un-preferito.md) | [Prossima](112-il-backup-che-non-e-mai-stato-testato.md)**
