@@ -20,7 +20,7 @@
 
 **Data**: 16/01/2027
 
-JN tocca feature flag vecchi di 18 mesi. I prezzi impazziscono. E i clienti vedono prezzi a caso. Perché i feature flag vanno rimossi. Sempre.
+Un feature flag disabilitato dal Black Friday 2024. JN lo tocca per sbaglio. 847 client bloccati. E 234 flag da auditare. Perché i feature flag vanno rimossi. Sempre.
 
 ---
 
