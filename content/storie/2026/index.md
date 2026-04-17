@@ -12,6 +12,46 @@
 
 ---
 
+### [Il Secret Che Era Nel Repo Pubblico](97-il-secret-che-era-nel-repo-pubblico.md)
+
+**Data**: 26/12/2026
+
+JN committa una chiave API nel repo pubblico. I bot la trovano in 10 minuti. E lanciano 847 istanze EC2. La fattura? 47.000 euro. E AWS non rimborsa tutto.
+
+---
+
+### [Il Webhook Che Ha Inondato La Coda](96-il-webhook-che-ha-inondato-la-coda.md)
+
+**Data**: 19/12/2026
+
+Un webhook che chiama se stesso. Un loop infinito. 511.221 messaggi nella coda. E JN che voleva solo "testare".
+
+---
+
+### [Il Certificato Scaduto Che Ha Ucciso Tutto](95-il-certificato-scaduto-che-ha-ucciso-tutto.md)
+
+**Data**: 12/12/2026
+
+Il certificato SSL scade a mezzanotte. Sabato. E nessuno sa chi l'ha comprato. O dove sono i documenti. O come si rinnova.
+
+---
+
+### [Il Database Senza Password](94-il-database-senza-password.md)
+
+**Data**: 05/12/2026
+
+Un database senza password. Un tool "ottimizzatore" trovato su un forum. E JN che lancia DROP DATABASE pensando sia un comando di ottimizzazione.
+
+---
+
+### [Il Log Che Ha Riempito Il Disco](93-il-log-che-ha-riempito-il-disco.md)
+
+**Data**: 28/11/2026
+
+Un log che cresce. E cresce. E cresce. Finché il disco non ha più spazio. E il sistema si ferma. E nessuno sa perché.
+
+---
+
 ### [Il Server Fantasma](35-il-server-fantasma.md)
 
 **Data**: 18/10/2026

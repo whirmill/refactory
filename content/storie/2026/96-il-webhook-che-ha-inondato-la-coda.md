@@ -2,7 +2,7 @@
 
 **Data**: 19/12/2026
 
-**[Storie 2026](index.md) | [Precedente](95-il-certificato-scaduto-che-ha-ucciso-tutto.md) | [Prossima](97-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](95-il-certificato-scaduto-che-ha-ucciso-tutto.md) | [Prossima](97-il-secret-che-era-nel-repo-pubblico.md)**
 
 ---
 
@@ -1238,4 +1238,4 @@ I commenti vengono aggiunti quando e, più importante, se ho tempo di moderarli 
 
 ---
 
-**[Storie 2026](index.md) | [Precedente](95-il-certificato-scaduto-che-ha-ucciso-tutto.md) | [Prossima](97-la-lezione.md)**
+**[Storie 2026](index.md) | [Precedente](95-il-certificato-scaduto-che-ha-ucciso-tutto.md) | [Prossima](97-il-secret-che-era-nel-repo-pubblico.md)**
